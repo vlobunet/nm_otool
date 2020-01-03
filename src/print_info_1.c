@@ -9,20 +9,20 @@ void p_m(char *type, char *src)
 	ft_putendl_fd(src, STDOUT);
 }
 
-void print_hdr_info(uint32_t hdr_magic, uint32_t hdr_filetype, int is_64)
+void print_hdr_info(uint32_t hdr_magic, uint32_t hdr_filetype)
 {
 	uint32_t magic;
 	uint32_t filetype;
 
 	printf("____________________ HEDADER ____________________\n\n");
-	magic = endian(hdr_magic, is_64);
+	magic = get_4b(hdr_magic);
 	if (magic == MH_MAGIC)
 		p_m("MAGIC", M_MH_MAGIC);
 	else if (magic == MH_MAGIC_64)
 		p_m("MAGIC", M_MH_MAGIC_64);
 	else
 		p_m("MAGIC", M_MH_UNKNOWN);
-	filetype = endian(hdr_filetype, is_64);
+	filetype = get_4b(hdr_filetype);
 	filetype == MH_OBJECT ? p_m("FILETYPE", M_MH_OBJECT) : 0;
 	filetype == MH_EXECUTE ? p_m("FILETYPE", M_MH_EXECUTE) : 0;
 	filetype == MH_FVMLIB ? p_m("FILETYPE", M_MH_FVMLIB) : 0;

@@ -19,7 +19,7 @@ int	err(const int err, const char *str)
 	return (1);
 }
 
-int mmap_file (int argc, char **argv, t_save_file *f)
+int mmap_file (int argc, char **argv)
 {
 	int			fd;
 	struct stat	buf;
@@ -35,9 +35,9 @@ int mmap_file (int argc, char **argv, t_save_file *f)
 	if ((p = mmap(0, buf.st_size, PROT_READ, MAP_PRIVATE, fd, 0)) == MAP_FAILED)
 		return (err(ERR_SYS, "mmap: unable to map file to memory"));
 	close(fd);
-	f->p = p;
-	f->size = buf.st_size;
-	f->ofset = 0;
+	g_f.p = p;
+	g_f.size = buf.st_size;
+	g_f.ofset = 0;
 	return (0);
 }
 
@@ -48,19 +48,19 @@ int munmap_file(t_save_file f)
 	return (0);
 }
 
-void *safe(const uint64_t offset, const size_t size, t_save_file *f)
+void *safe(const uint64_t offset, const size_t size)
 {
 	if (offset + size < offset)
 		return (NULL);
-	return ((void *)((size_t)(f->p + f->ofset + offset) * \
-		(f->ofset + offset + size <= f->size)));
+	return ((void *)((size_t)(g_f.p + g_f.ofset + offset) * \
+		(g_f.ofset + offset + size <= g_f.size)));
 }
 
-int check_architecture(t_save_file file)
+int check_architecture(void)
 {
 	uint32_t *magic = NULL;
 
-	if (!(magic = safe(0, sizeof(*magic), &file)))
+	if (!(magic = safe(0, sizeof(*magic))))
 	{
 		err(ERR_SYS, "unable magic");
 		return(-1);
@@ -73,24 +73,16 @@ int check_architecture(t_save_file file)
 	return (-1);
 }
 
-uint32_t			endian(uint32_t n, int is_64)
-{
-	if (!is_64)
-		return ((n >> 24) | ((n & 0xff0000) >> 8) | \
-			((n & 0xff00) << 8) | (n << 24));
-	return (n);
-}
-
-int print_segment_command(size_t ofset, t_save_file f)
+int print_segment_command(size_t ofset)
 {
 	struct segment_command *seg_cmd;
 	unsigned long cmdsize;
 	char *segname;
 
-	seg_cmd = safe(ofset, sizeof(*seg_cmd), &f);
+	seg_cmd = safe(ofset, sizeof(*seg_cmd));
 	if (!seg_cmd)
 		return (err(ERR_SYS, __func__));
-	cmdsize = endian(seg_cmd->cmdsize, f.is_64);
+	cmdsize = get_4b(seg_cmd->cmdsize);
 	printf("cmdsize:\t%ld\n", cmdsize);
 	segname = ft_strndup(seg_cmd->segname, 16);
 	printf("segname:\t%s\n", segname);
@@ -113,8 +105,114 @@ int	nm_symbol_allocate(t_sym_sort *syms, const uint64_t nsyms)
 	return (0);
 }
 
+char		nm_sections_character_table(const size_t offset)
+{
+	static char				sections_character[256];
+	static uint8_t			sections = 0;
+	char					*sectname;
+	if (offset == 0)
+	{
+		printf("HERE_1\n");
+		ft_bzero(sections_character, 256);
+		sections = 0;
+	}
+	else if (FIRST_BIT_ON_64 & offset)
+	{
+		printf("HERE_2\n");
+		return (sections_character[offset & 0xff]);
+	}
+	else
+	{
+		printf("HERE_3\n");
+		if (!(sectname = safe(offset, 16)))
+			return (err(ERR_FILE, "bad section name offset"));
+		if (!ft_strncmp(sectname, "__text", 6))
+			sections_character[++sections] = 't';
+		else if (!ft_strncmp(sectname, "__data", 6))
+			sections_character[++sections] = 'd';
+		else if (!ft_strncmp(sectname, "__bss", 5))
+			sections_character[++sections] = 'b';
+		else
+			sections_character[++sections] = 's';
+	}
+	return ('1');
+}
 
-int print_symtab_command(size_t ofset, t_save_file f)
+static char	get_type(const uint64_t n_value, struct nlist *nlist, const uint16_t n_desc)
+{
+	char		type = '?';
+
+	(N_STAB & nlist->n_type) ? type = '-' : 0;
+	if ((N_TYPE & nlist->n_type) == N_UNDF)
+		type = n_value ? 'c' : 'u';
+	((N_TYPE & nlist->n_type) == N_ABS) ? type = 'a' : 0;
+	if ((N_TYPE & nlist->n_type) == N_SECT && !(type = nm_sections_character_table(FIRST_BIT_ON_64 | nlist->n_sect)))
+		type = '?';
+	((N_TYPE & nlist->n_type) == N_PBUD) ? type = 'u' : 0;
+	((N_TYPE & nlist->n_type) == N_INDR) ? type = 'i' : 0;
+	(n_desc & N_WEAK_REF) ? type = 'W' : 0;
+	(N_EXT & nlist->n_type) ? type = ft_toupper(type) : 0;
+	return (type);
+}
+
+static char	get_type_64(const uint64_t n_value, struct nlist_64 *nlist_64, const uint16_t n_desc)
+{
+	char		type = '?';
+
+	(N_STAB & nlist_64->n_type) ? type = '-' : 0;
+	if ((N_TYPE & nlist_64->n_type) == N_UNDF)
+		type = n_value ? 'c' : 'u';
+	((N_TYPE & nlist_64->n_type) == N_ABS) ? type = 'a' : 0;
+	if ((N_TYPE & nlist_64->n_type) == N_SECT && !(type = nm_sections_character_table(FIRST_BIT_ON_64 | nlist_64->n_sect)))
+		type = '?';
+	((N_TYPE & nlist_64->n_type) == N_PBUD) ? type = 'u' : 0;
+	((N_TYPE & nlist_64->n_type) == N_INDR) ? type = 'i' : 0;
+	(n_desc & N_WEAK_REF) ? type = 'W' : 0;
+	(N_EXT & nlist_64->n_type) ? type = ft_toupper(type) : 0;
+	return (type);
+}
+
+void push_nlist(struct nlist *nlist, unsigned long value, struct symtab_command *symc/*, t_sym_sort *syms*/)
+{
+	uint32_t off;
+	uint32_t size;
+	uint32_t stroff;
+	t_sym symbol;
+
+	off = get_4b(symc->stroff);
+	size = get_4b(symc->strsize);
+	stroff = off + get_4b(nlist->n_un.n_strx);
+
+	symbol.size = off + size - stroff;
+	symbol.str = safe(stroff, symbol.size);
+	symbol.type = get_type(value, nlist, get_2b(nlist->n_desc));
+	symbol.off = value;
+	if (stroff < off || stroff > off + size)
+		symbol.str = (char *)"bad string index";
+	printf("%#lX\t[typpe]\t%s\n", value, symbol.str);
+}
+
+void push_nlist_64(struct nlist_64 *nlist_64, unsigned long value, struct symtab_command *symc/*, t_sym_sort *sym*/)
+{
+	uint32_t	off;
+	uint32_t	size;
+	uint32_t	stroff;
+	t_sym		symbol;
+
+	off = get_4b(symc->stroff);
+	size = get_4b(symc->strsize);
+	stroff = off + get_4b(nlist_64->n_un.n_strx);
+
+	symbol.size = off + size - stroff;
+	symbol.str = safe(stroff, symbol.size);
+	symbol.type = get_type_64(value, nlist_64, get_2b(nlist_64->n_desc));
+	symbol.off = value;
+	if (stroff < off || stroff > off + size)
+		symbol.str = (char *)"bad string index";
+	printf("%#lX %c %s\n", value, symbol.type, symbol.str);
+}
+
+int print_symtab_command(size_t ofset)
 {
 	struct symtab_command	*sym_cmd;
 	uint32_t				nsyms;
@@ -126,102 +224,79 @@ int print_symtab_command(size_t ofset, t_save_file f)
 	t_sym_sort syms;
 	unsigned long value;
 
-	i = 0;
-
-	printf("SYMTAB_COMMAND\n");
-	sym_cmd = safe(ofset, sizeof(*sym_cmd), &f);
-	if (!sym_cmd)
+	if (!(sym_cmd = safe(ofset, sizeof(*sym_cmd))))
 		return (err(ERR_SYS, __func__));
-	nsyms = endian(sym_cmd->nsyms, f.is_64);
-	if (!nsyms)
+	if (!(nsyms = get_4b(sym_cmd->nsyms)))
 		return (err(ERR_SYS, __func__));
 	printf("nsyms:\t%d\n", nsyms);
-	symoff = endian(sym_cmd->symoff, f.is_64);
-	if (!f.is_64)
+	symoff = get_4b(sym_cmd->symoff);
+	if (!g_f.is_64)
 	{
-		if (!(nlist = safe(symoff, sizeof(*nlist) * nsyms, &f)))
+		if (!(nlist = safe(symoff, sizeof(*nlist) * nsyms)))
 			return (err(ERR_SYS, "bad offset or size (symbol table)."));
-		n_type = endian(nlist->n_type, f.is_64);
+		n_type = get_4b(nlist->n_type);
 	}
 	else
 	{
-		if (!(nlist_64 = safe(symoff, sizeof(*nlist_64) * nsyms, &f)))
+		if (!(nlist_64 = safe(symoff, sizeof(*nlist_64) * nsyms)))
 			return (err(ERR_SYS, "bad offset or size (symbol table)."));
-		n_type = endian(nlist_64->n_type, f.is_64);
+		n_type = get_4b(nlist_64->n_type);
 	}
-	if (!safe(symoff, endian(sym_cmd->strsize, f.is_64), &f))
+	if (!safe(symoff, get_4b(sym_cmd->strsize)))
 		return (err(ERR_SYS, __func__));
 	if (nm_symbol_allocate(&syms, nsyms) == -1)
 		return(-1);
-	n_type == N_STAB ? printf("n_type:\tN_STAB\n") : 0;
-	n_type == N_PEXT ? printf("n_type:\tN_PEXT\n") : 0;
-	n_type == N_TYPE ? printf("n_type:\tN_TYPE") : 0;
-	n_type == N_EXT ? printf("n_type:\tN_EXT\n") : 0;
-	if (n_type == N_TYPE)
-	{
-		n_type == N_UNDF ? printf(": N_UNDF (%#X)\n", n_type) : 0;
-		n_type == N_ABS ? printf(": N_ABS (%#X)\n", n_type) : 0;
-		n_type == N_SECT ? printf(": N_SECT (%#X)\n", n_type) : 0;
-		n_type == N_PBUD ? printf(": N_PBUD (%#X)\n", n_type) : 0;
-		n_type == N_INDR ? printf(": N_INDR (%#X)\n", n_type) : 0;
-	}
+	i = 0;
 	while (i < nsyms)
 	{
-		value = (!f.is_64 ? endian(nlist[i].n_value, f.is_64) :
-			endian(nlist_64[i].n_value, f.is_64));
-		printf("%#lXs\n", value);
-
+		value = (!g_f.is_64 ? get_8b(nlist[i].n_value) :
+			get_8b(nlist_64[i].n_value));
+		!g_f.is_64 ? push_nlist((struct nlist*)&nlist[i], value, sym_cmd/*, &syms*/) :
+		push_nlist_64((struct nlist_64*)&nlist_64[i], value, sym_cmd/*, &syms*/);
 		i++;
 	}
 	return (0);
 }
 
-int main_parser(t_save_file f)
+
+int main_parser(void)
 {
 	size_t ofset;
 	struct mach_header		*hdr;
 	struct mach_header_64	*hdr_64;
 	struct load_command		*lc;
 	uint32_t				ncmds;
-	uint32_t				target;
 	uint32_t				cmd_type;
 
 
-	ofset = (!f.is_64 ? sizeof(struct mach_header) : sizeof(struct mach_header_64));
-
-	if (!f.is_64)
+	ofset = (!g_f.is_64 ? sizeof(struct mach_header) : sizeof(struct mach_header_64));
+	if (!g_f.is_64)
 	{
-		hdr = safe(0, sizeof(*hdr), &f);
-		if (!hdr)
+		if (!(hdr = safe(0, sizeof(*hdr))))
 			return (err(ERR_SYS, __func__));
-		ncmds = endian(hdr->ncmds, f.is_64);
-		target = LC_SEGMENT;
-		print_hdr_info(hdr->magic, hdr->filetype, f.is_64);
+		ncmds = get_4b(hdr->ncmds);
+		print_hdr_info(hdr->magic, hdr->filetype);
 	}
 	else
 	{
-		hdr_64 = safe(0, sizeof(*hdr_64), &f);
-		if (!hdr_64)
+		if (!(hdr_64 = safe(0, sizeof(*hdr_64))))
 			return (err(ERR_SYS, __func__));
-		ncmds = endian(hdr_64->ncmds, f.is_64);
-		target = LC_SEGMENT_64;
-		print_hdr_info(hdr_64->magic, hdr_64->filetype, f.is_64);
+		ncmds = get_4b(hdr_64->ncmds);
+		print_hdr_info(hdr_64->magic, hdr_64->filetype);
 	}
-	printf("\n____________________ LC_SEGMENT_X ______________________\n\n");
-	lc = safe(ofset, sizeof(*lc), &f);
-	if (!lc)
+
+	if (!(lc = safe(ofset, sizeof(*lc))))
 		return (err(ERR_SYS, __func__));
 	while (ncmds--)
 	{
-		cmd_type = endian(lc->cmd, f.is_64);
+		cmd_type = get_4b(lc->cmd);
 		print_load_command_sector(cmd_type);
-		if (cmd_type == target)
-			print_segment_command(ofset, f);
+		if (cmd_type == (g_f.is_64 ? LC_SEGMENT_64 : LC_SEGMENT))
+			print_segment_command(ofset);
 		if (cmd_type == LC_SYMTAB)
-			print_symtab_command(ofset, f);
-		ofset = ofset + endian(lc->cmdsize, f.is_64);
-		lc = safe(ofset, sizeof(*lc), &f);
-		if (!hdr)
+			print_symtab_command(ofset);
+		ofset = ofset + get_4b(lc->cmdsize);
+		if (!(lc = safe(ofset, sizeof(*lc))))
 			return (err(ERR_SYS, __func__));
 	}
 	return (0);
@@ -229,14 +304,12 @@ int main_parser(t_save_file f)
 
 int main(int argc, char **argv)
 {
-	t_save_file f;
-
-	if (mmap_file(argc, argv, &f))
+	if (mmap_file(argc, argv))
 		return(1);
-	if ((f.is_64 = check_architecture(f)) == -1)
+	if ((g_f.is_64 = check_architecture()) == -1)
 		return (1);
-	main_parser(f);
-	if (munmap_file(f))
+	main_parser();
+	if (munmap_file(g_f))
 		return (1);
 	return (0);
 }

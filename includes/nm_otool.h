@@ -43,6 +43,18 @@
 
 # define ARCHIVE_CIGAM		0x72613C21
 # define ARCHIVE_MAGIC		0x213C6172
+# define FIRST_BIT_ON_64	0x8000000000000000L
+
+#define N_STAB  0xe0            /* if any of these bits set, a symbolic debugging entry */
+#define N_PEXT  0x10            /* private external symbol bit */
+#define N_TYPE  0x0e            /* mask for the type bits */
+#define N_EXT   0x01            /* external symbol bit, set for external symbols */
+
+#define N_UNDF  0x0             /* undefined, n_sect == NO_SECT */
+#define N_ABS   0x2             /* absolute, n_sect == NO_SECT */
+#define N_SECT  0xe             /* defined in section number n_sect */
+#define N_PBUD  0xc             /* prebound undefined (defined in a dylib) */
+#define N_INDR  0xa             /* indirect */
 
 # define M_MH_OBJECT "MH_OBJECT (Relocatable object file)"
 # define M_MH_EXECUTE "MH_EXECUTE (Demand paged executable file)"
@@ -103,6 +115,13 @@
 # define M_LC_NOTE "(arbitrary data included within a Mach-O file)"
 # define M_LC_BUILD_VERSION "(build for platform min OS version)"
 
+typedef struct	s_sym
+{
+	uint64_t	off;
+	char		*str;
+	uint32_t	size;
+	char		type;
+}				t_sym;
 
 typedef struct s_save_file
 {
@@ -131,11 +150,14 @@ typedef struct	s_sym_sort
 	size_t		nsyms_sort;
 }				t_sym_sort;
 
+t_save_file g_f;
 
 void print_load_command_sector(uint32_t c);
-void print_hdr_info(uint32_t hdr_magic, uint32_t hdr_filetype, int is_64);
+void print_hdr_info(uint32_t hdr_magic, uint32_t hdr_filetype);
 void p_m(char *type, char *src);
 
-uint32_t			endian(uint32_t n, int is_64);
+uint16_t			get_2b(uint16_t n);
+uint32_t			get_4b(uint32_t n);
+uint64_t			get_8b(uint64_t n);
 
 #endif
