@@ -6,7 +6,7 @@ CC = gcc
 
 CFLAGS = -Wall -Wextra -Werror -fsanitize=address,undefined
 
-COMMON_SRC = print_info_1.c get_bytes.c
+COMMON_SRC = print_info_1.c get_bytes.c print_error_attrlett.c check_attributes.c
 
 NM_SRC = ft_nm.c ${COMMON_SRC}
 

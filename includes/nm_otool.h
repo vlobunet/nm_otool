@@ -152,6 +152,39 @@ typedef struct	s_sym_sort
 
 t_save_file g_f;
 
+typedef struct	s_attr
+{
+	uint8_t		t;
+	char		**files;
+}				t_attr;
+
+typedef struct s_manager
+{
+	size_t ofset;
+	struct mach_header		*hdr;
+	struct mach_header_64	*hdr_64;
+	struct load_command		*lc;
+	uint32_t				ncmds;
+	uint32_t				cmd_type;
+} t_manager;
+
+typedef struct s_cymmanager
+{
+	struct symtab_command	*sym_cmd;
+	uint32_t				nsyms;
+	uint32_t				i;
+	struct nlist			*nlist;
+	struct nlist_64			*nlist_64;
+	uint32_t				symoff;
+	uint8_t					n_type;
+	t_sym_sort				syms;
+	uint64_t				value;
+} t_cymmanager;
+// typedef void	(*t_fat_magic_retriever)(uint32_t, size_t, size_t*, uint32_t*);
+// typedef void	(*t_gatherer)(const bool);
+typedef void (*t_lc)(const size_t);
+typedef int	(*t_cmanager)(size_t start_offset);
+
 void print_load_command_sector(uint32_t c);
 void print_hdr_info(uint32_t hdr_magic, uint32_t hdr_filetype);
 void p_m(char *type, char *src);
@@ -159,5 +192,11 @@ void p_m(char *type, char *src);
 uint16_t			get_2b(uint16_t n);
 uint32_t			get_4b(uint32_t n);
 uint64_t			get_8b(uint64_t n);
+
+t_attr *check_atributes(char **argv);
+int check_lines(char **argv);
+int	err_otool(const int err, const char *str);
+
+int segment_command_manager(size_t start_offset);
 
 #endif
