@@ -121,18 +121,39 @@ typedef struct	s_sym
 	char		*str;
 	uint32_t	size;
 	char		type;
+	struct s_sym *n;
+	struct s_sym *p;
 }				t_sym;
 
-typedef struct s_save_file
+typedef struct	s_attr
 {
-	int is_64;
-	void *p;
+	uint8_t		U;	// nm | U symbol type
+	uint8_t		T;	// nm | T/t symbol type
+	uint8_t		B;	// nm | B/b symbol type
+	uint8_t		S;	// nm | S/s symbol type
+	uint8_t		D;	// nm | D/d symbol type
+	uint8_t		C;
+	uint8_t		I;
+	uint8_t		A;
+	uint8_t		n;	// nm | sort by numeric
+	uint8_t		t;	// nm | sort by type
+	uint8_t		a;	// nm | sort by alpha
+	char		**f;
+}				t_attr;
+
+typedef struct				s_save_file
+{
+	int						is_64;
+	void					*p;
 	struct mach_header		hdr;
 	struct mach_header_64	hdr_64;
 	struct load_command		lc;
-	size_t size;
-	size_t ofset;
-} t_save_file;
+	size_t					size;
+	size_t					ofset;
+	t_attr					*attributes;
+	t_sym					*lstsym;
+
+}							t_save_file;
 
 typedef struct	s_strsymbol
 {
@@ -142,21 +163,14 @@ typedef struct	s_strsymbol
 	char		type;
 }				t_strsymbol;
 
-
 typedef struct	s_sym_sort
 {
 	t_strsymbol	*symbols;
-	t_strsymbol	**symbols_sort;
+	//t_strsymbol	**symbols_sort;
 	size_t		nsyms_sort;
 }				t_sym_sort;
 
 t_save_file g_f;
-
-typedef struct	s_attr
-{
-	uint8_t		t;
-	char		**files;
-}				t_attr;
 
 typedef struct s_manager
 {
@@ -188,15 +202,23 @@ typedef int	(*t_cmanager)(size_t start_offset);
 void print_load_command_sector(uint32_t c);
 void print_hdr_info(uint32_t hdr_magic, uint32_t hdr_filetype);
 void p_m(char *type, char *src);
+int check_architecture(void);
+int	err(const int err, const char *str);
+int mmap_file (int argc, char **argv);
+int munmap_file(t_save_file f);
 
 uint16_t			get_2b(uint16_t n);
 uint32_t			get_4b(uint32_t n);
 uint64_t			get_8b(uint64_t n);
+void *get_struct(const uint64_t offset, const size_t size);
 
 t_attr *check_atributes(char **argv);
-int check_lines(char **argv);
+int check_lines(char **argv, uint8_t is_nm);
 int	err_otool(const int err, const char *str);
+t_attr	*init_array_attributes(void);
+int		search_letter(char *str, char c);
 
 int segment_command_manager(size_t start_offset);
+void push(t_sym *symbol, t_sym **lst);
 
 #endif

@@ -28,3 +28,11 @@ uint64_t			get_8b(uint64_t n)
 			| (n & 0x00000000000000ff) << 56);
 	return (n);
 }
+
+void *get_struct(const uint64_t offset, const size_t size)
+{
+	if (offset + size < offset)
+		return (NULL);
+	return ((void *)((size_t)(g_f.p + g_f.ofset + offset) * \
+		(g_f.ofset + offset + size <= g_f.size)));
+}

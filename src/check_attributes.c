@@ -2,19 +2,27 @@
 
 t_attr	*init_array_attributes(void)
 {
-	//printf("[%s]\n", __func__);
 	t_attr *attr;
 
-	if (!(attr = malloc(sizeof(t_attr))))
+	if (!(attr = (t_attr *)malloc(sizeof(t_attr))))
 		return (NULL);
+	attr->U = 0;
+	attr->T = 0;
+	attr->B = 0;
+	attr->S = 0;
+	attr->D = 0;
+	attr->C = 0;
+	attr->I = 0;
+	attr->A = 0;
+	attr->a = 0;
+	attr->n = 0;
 	attr->t = 0;
-	attr->files = NULL;
+	attr->f = NULL;
 	return (attr);
 }
 
 int		search_letter(char *str, char c)
 {
-	//printf("[%s]\n", __func__);
 	int i;
 
 	i = 0;
@@ -30,14 +38,13 @@ int		search_letter(char *str, char c)
 
 t_attr	*check_atributes(char **argv)
 {
-	//printf("[%s]\n", __func__);
 	t_attr	*attr;
 	int		ret;
 
 	ret = 0;
 	if (!argv || !*argv)
 		ret = err_otool(ERR_USAGE, "invalid number of attributes");
-	else if (!*argv || *argv[0] != '-' || !check_lines(argv))
+	else if (!*argv || *argv[0] != '-' || !check_lines(argv, 1))
 		ret = err_otool(ERR_USAGE, *argv);
 	if (ret)
 		return (NULL);
@@ -48,7 +55,7 @@ t_attr	*check_atributes(char **argv)
 			attr->t = 1;
 		argv = argv + 1;
 	}
-	if (argv && *argv && ((attr->files = argv)))
+	if (argv && *argv && ((attr->f = argv)))
 		return (attr);
 	err_otool(ERR_USAGE, "invalid number of attributes");
 	free(attr);

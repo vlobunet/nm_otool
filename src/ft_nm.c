@@ -1,107 +1,18 @@
 #include "../includes/nm_otool.h"
 
-int	err(const int err, const char *str)
-{
-	static const char	*msg[ERR_NUMBER] =
-	{
-		"Fatal Error: ",
-		"Bad usage: ",
-		"Bad file: ",
-	};
-
-	ft_putstr_fd(RED, STDERR);
-	ft_putstr_fd(msg[err], STDERR);
-	ft_putstr_fd(RES, STDERR);
-	ft_putstr_fd(str, STDERR);
-	ft_putstr_fd("\n", STDERR);
-	if (err == ERR_USAGE)
-		ft_putstr_fd("usage: ./ft_nm <fname> \n", STDERR);
-	return (1);
-}
-
-int mmap_file (int argc, char **argv)
-{
-	int			fd;
-	struct stat	buf;
-	void		*p;
-
-
-	if (argc > 2)
-		return (err(ERR_USAGE, "erroneous input."));
-	if ((fd = open((argc == 1 ? "a.out" : argv[1]), O_RDONLY)) == -1)
-		return (err(ERR_FILE, "No such file or directory"));
-	if (fstat(fd, &buf) < 0 || buf.st_mode & S_IFDIR)
-		return (err(ERR_FILE, "you can only use MACH-O files."));
-	if ((p = mmap(0, buf.st_size, PROT_READ, MAP_PRIVATE, fd, 0)) == MAP_FAILED)
-		return (err(ERR_SYS, "mmap: unable to map file to memory"));
-	close(fd);
-	g_f.p = p;
-	g_f.size = buf.st_size;
-	g_f.ofset = 0;
-	return (0);
-}
-
-int munmap_file(t_save_file f)
-{
-	if (munmap(f.p, f.size))
-		return (err(ERR_SYS, "munmap: unable to free file displayed in memory"));
-	return (0);
-}
-
-void *safe(const uint64_t offset, const size_t size)
-{
-	if (offset + size < offset)
-		return (NULL);
-	return ((void *)((size_t)(g_f.p + g_f.ofset + offset) * \
-		(g_f.ofset + offset + size <= g_f.size)));
-}
-
-int check_architecture(void)
-{
-	uint32_t *magic = NULL;
-
-	if (!(magic = safe(0, sizeof(*magic))))
-	{
-		err(ERR_SYS, "unable magic");
-		return(-1);
-	}
-	if (*magic == MH_CIGAM || *magic == MH_MAGIC)
-		return (0);
-	if (*magic == MH_CIGAM_64 || *magic == MH_MAGIC_64)
-		return (1);
-	err(ERR_FILE, "unknown format");
-	return (-1);
-}
-
 int print_segment_command(size_t ofset)
 {
 	struct segment_command *seg_cmd;
 	unsigned long cmdsize;
 	char *segname;
 
-	seg_cmd = safe(ofset, sizeof(*seg_cmd));
+	seg_cmd = get_struct(ofset, sizeof(*seg_cmd));
 	if (!seg_cmd)
 		return (err(ERR_SYS, __func__));
 	cmdsize = get_4b(seg_cmd->cmdsize);
 	printf("cmdsize:\t%ld\n", cmdsize);
 	segname = ft_strndup(seg_cmd->segname, 16);
 	printf("segname:\t%s\n", segname);
-	return (0);
-}
-
-
-int	nm_symbol_allocate(t_sym_sort *syms, const uint64_t nsyms)
-{
-	ft_bzero(syms, sizeof(*syms));
-	if (nsyms)
-	{
-		syms->symbols = ft_memalloc(nsyms * sizeof(t_strsymbol));
-		if (!syms->symbols)
-			return (err(ERR_SYS, "malloc failed"));
-		syms->symbols_sort = ft_memalloc(nsyms * sizeof(void *));
-		if (!syms->symbols_sort)
-			return (err(ERR_SYS, "malloc failed"));
-	}
 	return (0);
 }
 
@@ -122,7 +33,7 @@ char		nm_sections_character_table(const size_t offset)
 	}
 	else
 	{
-		if (!(sectname = safe(offset, 16)))
+		if (!(sectname = get_struct(offset, 16)))
 			return (err(ERR_FILE, "bad section name offset"));
 		if (!ft_strncmp(sectname, "__text", 6))
 			sections_character[++sections] = 't';
@@ -170,67 +81,98 @@ static char	get_type_64(const uint64_t n_value, struct nlist_64 *nlist_64, const
 	return (type);
 }
 
-void push_nlist(struct nlist *nlist, unsigned long value, struct symtab_command *symc/*, t_sym_sort *syms*/)
+void push(t_sym *symbol, t_sym **lst)
+{
+	if (*lst && symbol)
+	{
+		symbol->p = *lst;
+		(*lst)->n = symbol;
+	}
+	*lst = symbol;
+}
+
+int check_symbol_type(char c)
+{
+	if ((ft_tolower(c) == 'u' && !g_f.attributes->U) ||
+		(ft_tolower(c) == 't' && !g_f.attributes->T) ||
+		(ft_tolower(c) == 'b' && !g_f.attributes->B) ||
+		(ft_tolower(c) == 's' && !g_f.attributes->S) ||
+		(ft_tolower(c) == 'd' && !g_f.attributes->D) ||
+		(ft_tolower(c) == 'c' && !g_f.attributes->C) ||
+		(ft_tolower(c) == 'i' && !g_f.attributes->I) ||
+		(ft_tolower(c) == 'a' && !g_f.attributes->A))
+		return (0);
+	return (1);
+}
+void push_nlist(struct nlist *nlist, unsigned long value, struct symtab_command *symc)
 {
 	uint32_t off;
 	uint32_t size;
 	uint32_t stroff;
-	t_sym symbol;
+	t_sym *symbol;
 
 	off = get_4b(symc->stroff);
 	size = get_4b(symc->strsize);
 	stroff = off + get_4b(nlist->n_un.n_strx);
-
-	symbol.size = off + size - stroff;
-	symbol.str = safe(stroff, symbol.size);
-	symbol.type = get_type(value, nlist, get_2b(nlist->n_desc));
-	symbol.off = value;
+	if (!check_symbol_type(get_type(value, nlist, get_2b(nlist->n_desc))))
+		return ;
+	symbol = (t_sym *)malloc(sizeof(t_sym));
+	symbol->size = off + size - stroff;
+	symbol->str = get_struct(stroff, symbol->size);
+	symbol->type = get_type(value, nlist, get_2b(nlist->n_desc));
+	symbol->off = value;
+	symbol->n = NULL;
+	symbol->p = NULL;
 	if (stroff < off || stroff > off + size)
-		symbol.str = (char *)"bad string index";
-	//printf("%#lX\t[typpe]\t%s\n", value, symbol.str);
+		symbol->str = (char *)"bad string index";
+	push(symbol, &(g_f.lstsym));
 }
 
-void push_nlist_64(struct nlist_64 *nlist_64, uint64_t value, struct symtab_command *symc/*, t_sym_sort *sym*/)
+void push_nlist_64(struct nlist_64 *nlist_64, uint64_t value, struct symtab_command *symc)
 {
 	uint32_t	off;
 	uint32_t	size;
 	uint32_t	stroff;
-	t_sym		symbol;
+	t_sym		*symbol;
 
+	symbol = (t_sym *)malloc(sizeof(t_sym));
 	off = get_4b(symc->stroff);
 	size = get_4b(symc->strsize);
 	stroff = off + get_4b(nlist_64->n_un.n_strx);
-
-	symbol.size = off + size - stroff;
-	symbol.str = safe(stroff, symbol.size);
-	symbol.type = get_type_64(value, nlist_64, get_2b(nlist_64->n_desc));
-	symbol.off = value;
+	if (!check_symbol_type(get_type_64(value, nlist_64, get_2b(nlist_64->n_desc))))
+		return ;
+	symbol->size = off + size - stroff;
+	symbol->str = get_struct(stroff, symbol->size);
+	symbol->type = get_type_64(value, nlist_64, get_2b(nlist_64->n_desc));
+	symbol->off = value;
+	symbol->n = NULL;
+	symbol->p = NULL;
 	if (stroff < off || stroff > off + size)
-		symbol.str = (char *)"bad string index";
-	printf("%llX %c %s\n", value, symbol.type, symbol.str);
+		symbol->str = (char *)"bad string index";
+	push(symbol, &(g_f.lstsym));
 }
 
 int symtab_manager(size_t ofset)
 {
 	t_cymmanager m;
 
-	if (!(m.sym_cmd = safe(ofset, sizeof(*(m.sym_cmd)))))
+	if (!(m.sym_cmd = get_struct(ofset, sizeof(*(m.sym_cmd)))))
 		return (err(ERR_SYS, __func__));
 	if (!(m.nsyms = get_4b(m.sym_cmd->nsyms)))
 		return (err(ERR_SYS, __func__));
 	m.symoff = get_4b(m.sym_cmd->symoff);
-	if (!(m.nlist = safe(m.symoff, sizeof(*(m.nlist)) * m.nsyms)))
+	if (!(m.nlist = get_struct(m.symoff, sizeof(*(m.nlist)) * m.nsyms)))
 		return (err(ERR_SYS, "bad offset or size (symbol table)."));
 	m.n_type = get_4b(m.nlist->n_type);
-	if (!safe(m.symoff, get_4b(m.sym_cmd->strsize)))
+	if (!get_struct(m.symoff, get_4b(m.sym_cmd->strsize)))
 		return (err(ERR_SYS, __func__));
-	if (nm_symbol_allocate(&m.syms, m.nsyms) == -1)
-		return(-1);
+	// if (nm_symbol_allocate(&m.syms, m.nsyms) == -1)
+	// 	return(-1);
 	m.i = 0;
 	while (m.i < m.nsyms)
 	{
 		m.value = get_8b(m.nlist[m.i].n_value);
-		push_nlist((struct nlist*)&m.nlist[m.i], m.value, m.sym_cmd/*, &syms*/);
+		push_nlist((struct nlist*)&m.nlist[m.i], m.value, m.sym_cmd);
 		m.i++;
 	}
 	return (0);
@@ -240,23 +182,23 @@ int symtab_manager_64(size_t ofset)
 {
 	t_cymmanager m;
 
-	if (!(m.sym_cmd = safe(ofset, sizeof(*(m.sym_cmd)))))
+	if (!(m.sym_cmd = get_struct(ofset, sizeof(*(m.sym_cmd)))))
 		return (err(ERR_SYS, __func__));
 	if (!(m.nsyms = get_4b(m.sym_cmd->nsyms)))
 		return (err(ERR_SYS, __func__));
 	m.symoff = get_4b(m.sym_cmd->symoff);
-	if (!(m.nlist_64 = safe(m.symoff, sizeof(*(m.nlist_64)) * m.nsyms)))
+	if (!(m.nlist_64 = get_struct(m.symoff, sizeof(*(m.nlist_64)) * m.nsyms)))
 		return (err(ERR_SYS, "bad offset or size (symbol table)."));
 	m.n_type = get_4b(m.nlist_64->n_type);
-	if (!safe(m.symoff, get_4b(m.sym_cmd->strsize)))
+	if (!get_struct(m.symoff, get_4b(m.sym_cmd->strsize)))
 		return (err(ERR_SYS, __func__));
-	if (nm_symbol_allocate(&m.syms, m.nsyms) == -1)
-		return(-1);
+	// if (nm_symbol_allocate(&m.syms, m.nsyms) == -1)
+	// 	return(-1);
 	m.i = 0;
 	while (m.i < m.nsyms)
 	{
 		m.value = get_8b(m.nlist_64[m.i].n_value);
-		push_nlist_64((struct nlist_64*)&m.nlist_64[m.i], m.value, m.sym_cmd/*, &syms*/);
+		push_nlist_64((struct nlist_64*)&m.nlist_64[m.i], m.value, m.sym_cmd);
 		m.i++;
 	}
 	return (0);
@@ -271,10 +213,10 @@ int segment_manager(size_t start_offset)
 	const char					*target_segment = NULL;
 	const char					*target_section = NULL;
 
-	if (!(seg = safe(start_offset, sizeof(*seg))))
+	if (!(seg = get_struct(start_offset, sizeof(*seg))))
 		return (err(ERR_FILE, "bad segment offset"));
 	offset = start_offset + sizeof(*seg);
-	if (!(sect = safe(offset, sizeof(*sect))))
+	if (!(sect = get_struct(offset, sizeof(*sect))))
 		return (err(ERR_FILE, "bad section offset"));
 	nsects = get_4b(seg->nsects);
 	while (nsects--)
@@ -284,7 +226,7 @@ int segment_manager(size_t start_offset)
 		&& !nm_sections_character_table(offset))
 			return (err(ERR_SYS, __func__));
 		offset += sizeof(*sect);
-		if (!(sect = safe(offset, sizeof(*sect))))
+		if (!(sect = get_struct(offset, sizeof(*sect))))
 			return (err(ERR_FILE, "bad section offset"));
 	}
 	return (0);
@@ -295,11 +237,11 @@ static int main_parser(t_cmanager ptr_func, uint32_t type)
 	t_manager m;
 
 	m.ofset = sizeof(struct mach_header);
-	if (!(m.hdr = safe(0, sizeof(*(m.hdr)))))
+	if (!(m.hdr = get_struct(0, sizeof(*(m.hdr)))))
 		return (err(ERR_SYS, __func__));
 	m.ncmds = get_4b(m.hdr->ncmds);
 	print_hdr_info(m.hdr->magic, m.hdr->filetype);
-	if (!(m.lc = safe(m.ofset, sizeof(*(m.lc)))))
+	if (!(m.lc = get_struct(m.ofset, sizeof(*(m.lc)))))
 		return (err(ERR_SYS, __func__));
 	while (m.ncmds--)
 	{
@@ -307,7 +249,7 @@ static int main_parser(t_cmanager ptr_func, uint32_t type)
 		if (m.cmd_type == type)
 			ptr_func(m.ofset);
 		m.ofset = m.ofset + get_4b(m.lc->cmdsize);
-		if (!(m.lc = safe(m.ofset, sizeof(*m.lc))))
+		if (!(m.lc = get_struct(m.ofset, sizeof(*m.lc))))
 			return (err(ERR_SYS, __func__));
 	}
 	return (0);
@@ -318,10 +260,10 @@ static int main_parser_64(t_cmanager ptr_func, uint32_t type)
 	t_manager m;
 
 	m.ofset = sizeof(struct mach_header_64);
-	if (!(m.hdr_64 = safe(0, sizeof(*(m.hdr_64)))))
+	if (!(m.hdr_64 = get_struct(0, sizeof(*(m.hdr_64)))))
 		return (err(ERR_SYS, __func__));
 	m.ncmds = get_4b(m.hdr_64->ncmds);
-	if (!(m.lc = safe(m.ofset, sizeof(*(m.lc)))))
+	if (!(m.lc = get_struct(m.ofset, sizeof(*(m.lc)))))
 		return (err(ERR_SYS, __func__));
 	while (m.ncmds--)
 	{
@@ -329,10 +271,78 @@ static int main_parser_64(t_cmanager ptr_func, uint32_t type)
 		if (m.cmd_type == type)
 			ptr_func(m.ofset);
 		m.ofset = m.ofset + get_4b(m.lc->cmdsize);
-		if (!(m.lc = safe(m.ofset, sizeof(*(m.lc)))))
+		if (!(m.lc = get_struct(m.ofset, sizeof(*(m.lc)))))
 			return (err(ERR_SYS, __func__));
 	}
 	return (0);
+}
+
+void set_symbol(t_sym **cur)
+{
+	if ((*cur)->p)
+		(*cur)->p->n = (*cur)->n;
+	if ((*cur)->n)
+		(*cur)->n->p = (*cur)->p;
+	(*cur)->p = NULL;
+	(*cur)->n = NULL;
+}
+
+void print_lst(t_sym *sort)
+{
+	while (sort)
+	{
+
+		!sort->off ? printf("                 ") :
+					printf("0000000%llX ", sort->off);
+		printf("%c ", sort->type);
+		printf("%s\n", sort->str);
+		sort = sort->n;
+	}
+}
+
+void go_start_lst(void)
+{
+	while (g_f.lstsym->p)
+		g_f.lstsym = g_f.lstsym->p;
+}
+
+void sorted_symbol(t_sym *min, t_sym *cur, t_sym *sorted, int f)
+{
+	while (cur)
+	{
+		while (cur)
+		{
+			if ((f == 1 && min->off > cur->off) ||
+				(f == 2 && min->type > cur->type) ||
+				(f == 3 && ft_strcmp(min->str, cur->str) > 0))
+				min = cur;
+			cur = cur->n;
+		}
+		if (min == g_f.lstsym)
+			g_f.lstsym = g_f.lstsym->n;
+		set_symbol(&min);
+		push(min, &sorted);
+		cur = g_f.lstsym;
+		min = cur;
+	}
+	while (sorted->p)
+		sorted = sorted->p;
+	print_lst(sorted);
+}
+
+void lst_sort(void)
+{
+	while (g_f.lstsym->p)
+		g_f.lstsym = g_f.lstsym->p;
+
+	if (g_f.attributes->n && g_f.lstsym)
+		sorted_symbol(g_f.lstsym, g_f.lstsym->n, NULL, 1);
+	else if (g_f.attributes->t && g_f.lstsym)
+		sorted_symbol(g_f.lstsym, g_f.lstsym->n, NULL, 2);
+	else if (g_f.attributes->a && g_f.lstsym)
+		sorted_symbol(g_f.lstsym, g_f.lstsym->n, NULL, 3);
+	else
+		print_lst(g_f.lstsym);
 }
 
 int main(int argc, char **argv)
@@ -346,12 +356,13 @@ int main(int argc, char **argv)
 		return(1);
 	if ((g_f.is_64 = check_architecture()) == -1)
 		return (1);
-
 	g_f.is_64 ? main_parser_64(func_ptr[0], LC_SEGMENT_64) :
 	main_parser(func_ptr[0], LC_SEGMENT);
 
 	g_f.is_64 ? main_parser_64(func_ptr[2], LC_SYMTAB) :
 	main_parser(func_ptr[1], LC_SYMTAB);
+	lst_sort();
+	//lst_print();
 	if (munmap_file(g_f))
 		return (1);
 	return (0);
