@@ -2,7 +2,6 @@
 
 int	err_otool(const int err, const char *str)
 {
-	//printf("[%s]\n", __func__);
 	static const char	*msg[ERR_NUMBER] =
 	{
 		"Fatal Error: ",
@@ -16,10 +15,12 @@ int	err_otool(const int err, const char *str)
 	ft_putstr_fd(str, STDERR);
 	ft_putstr_fd("\n", STDERR);
 	if (err == ERR_USAGE)
+	{
 		ft_putstr_fd("usage: ./ft_otool -t [fname..]\n", STDERR);
+	}
 	return (1);
 }
-
+		
 void print_error_atribit_letter(char let)
 {
 	//printf("[%s]\n", __func__);
@@ -77,7 +78,7 @@ int check_lines(char **argv, uint8_t is_nm)
 	//printf("%s\n", __func__);
 	while (argv && *argv && *argv[0] == '-')
 	{
-		if (!check_word(*argv) || !control_attr(*argv, "UTBSDCIAantp", 1, 0))
+		if (!check_word(*argv) || !control_attr(*argv, "UTBSDCIAgantp", 1, 0))
 		{
 			!is_nm ? err(ERR_USAGE, *argv) : err_otool(ERR_USAGE, *argv);
 			return (0);

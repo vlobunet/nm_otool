@@ -39,7 +39,7 @@ void sorted_symbol(t_sym *min, t_sym *cur, t_sym *sorted, int f)
 		cur = g_f.lstsym;
 		min = cur;
 	}
-	while (sorted->p)
+	while (sorted && sorted->p)
 		sorted = sorted->p;
 	print_lst(sorted);
 }
@@ -51,9 +51,9 @@ void lst_sort(void)
 	if (g_f.attributes->p && g_f.lstsym)
 		print_lst(g_f.lstsym);
 	else if (g_f.attributes->n && g_f.lstsym)
-		sorted_symbol(g_f.lstsym, g_f.lstsym->n, NULL, 1);
+		sorted_symbol(g_f.lstsym, g_f.lstsym, NULL, 1);
 	else if (g_f.attributes->t && g_f.lstsym)
-		sorted_symbol(g_f.lstsym, g_f.lstsym->n, NULL, 2);
+		sorted_symbol(g_f.lstsym, g_f.lstsym, NULL, 2);
 	else
-		sorted_symbol(g_f.lstsym, g_f.lstsym->n, NULL, 3);
+		sorted_symbol(g_f.lstsym, g_f.lstsym, NULL, 3);
 }

@@ -51,12 +51,13 @@ uint32_t	get_4b(uint32_t n);
 uint64_t	get_8b(uint64_t n);
 void		*get_struct(const uint64_t offset, const size_t size);
 
-int			check_lines(char **argv, uint8_t is_nm);
 t_attr		*init_array_attributes(void);
 int			search_letter(char *str, char c);
 
 void		lst_sort(void);
 void		sorted_symbol(t_sym *min, t_sym *cur, t_sym *sorted, int f);
 void		print_lst(t_sym *sort);
+
+int segment_manager(size_t start_offset);
 
 #endif

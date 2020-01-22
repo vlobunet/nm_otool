@@ -10,7 +10,7 @@ static void push(t_sym *symbol, t_sym **lst)
 	*lst = symbol;
 }
 
-char	get_type(const uint64_t n_value, struct nlist *nlist, const uint16_t n_desc)
+char	get_type_86(const uint64_t n_value, struct nlist *nlist, const uint16_t n_desc)
 {
 	char		type = '?';
 
@@ -39,12 +39,12 @@ void push_nlist_86(struct nlist *nlist, unsigned long value, struct symtab_comma
 	off = get_4b(symc->stroff);
 	size = get_4b(symc->strsize);
 	stroff = off + get_4b(nlist->n_un.n_strx);
-	if (!check_symbol_type(get_type(value, nlist, get_2b(nlist->n_desc))))
+	if (!check_symbol_type(get_type_86(value, nlist, get_2b(nlist->n_desc))))
 		return ;
 	symbol = (t_sym *)malloc(sizeof(t_sym));
 	symbol->size = off + size - stroff;
 	symbol->str = get_struct(stroff, symbol->size);
-	symbol->type = get_type(value, nlist, get_2b(nlist->n_desc));
+	symbol->type = get_type_86(value, nlist, get_2b(nlist->n_desc));
 	symbol->off = value;
 	symbol->n = NULL;
 	symbol->p = NULL;
@@ -53,7 +53,7 @@ void push_nlist_86(struct nlist *nlist, unsigned long value, struct symtab_comma
 	push(symbol, &(g_f.lstsym));
 }
 
-int symtab_manager(size_t ofset)
+int symtab_manager_86(size_t ofset)
 {
 	t_cymmanager m;
 
@@ -78,7 +78,7 @@ int symtab_manager(size_t ofset)
 }
 
 
-int main_parser(t_cmanager ptr_func, uint32_t type)
+int main_parser_86(t_cmanager ptr_func, uint32_t type)
 {
 	t_manager m;
 

@@ -1,8 +1,22 @@
 #include "../includes/nm_otool.h"
+void print_other(void)
+{
+	ft_putstr_fd("\t-U -- Display symbols only U/u type.\n", STDERR);
+	ft_putstr_fd("\t-T -- Display symbols only T/t type.\n", STDERR);
+	ft_putstr_fd("\t-B -- Display symbols only B/b type.\n", STDERR);
+	ft_putstr_fd("\t-S -- Display symbols only S/s type.\n", STDERR);
+	ft_putstr_fd("\t-D -- Display symbols only D/d type.\n", STDERR);
+	ft_putstr_fd("\t-C -- Display symbols only C/c type.\n", STDERR);
+	ft_putstr_fd("\t-A -- Display symbols only A/a type.\n", STDERR);
+	ft_putstr_fd("\t-g -- Display only global symbol\n", STDERR);
+	ft_putstr_fd("\t-a -- Sort by name (alphabet)(default)\n", STDERR);
+	ft_putstr_fd("\t-n -- Sort by offset\n", STDERR);
+	ft_putstr_fd("\t-t -- Sort by type\n", STDERR);
+	ft_putstr_fd("\t-p -- Display as in the symbol table (no sort)\n", STDERR);
+}
 
 int	err(const int err, const char *str)
 {
-	//printf("%s\n", __func__);
 	static const char	*msg[ERR_NUMBER] =
 	{
 		"Fatal Error: ",
@@ -16,15 +30,15 @@ int	err(const int err, const char *str)
 	ft_putstr_fd(str, STDERR);
 	ft_putstr_fd("\n", STDERR);
 	if (err == ERR_USAGE)
-		ft_putstr_fd("usage: ./ft_nm <fname> \n", STDERR);
+	{
+		ft_putstr_fd("usage: ./ft_nm [-UTBSDCIAgantp] <input files> \n", STDERR);
+		print_other();
+	}
 	return (1);
 }
 
-t_attr *check_argv(char **argv)
+t_attr *check_argv(char **argv, t_attr *atr)
 {
-	//printf("%s\n", __func__);
-	t_attr *atr;
-
 	if (argv && *argv && *argv[0] == '-' && !check_lines(argv, 0))
 		return (NULL);
 	atr = init_array_attributes();
@@ -36,30 +50,25 @@ t_attr *check_argv(char **argv)
 		search_letter(*argv, 'S') ? atr->S = 1 : 0;
 		search_letter(*argv, 'D') ? atr->D = 1 : 0;
 		search_letter(*argv, 'A') ? atr->A = 1 : 0;
-		search_letter(*argv, 'I') ? atr->I = 1 : 0;
-		search_letter(*argv, 'C') ? atr->C = 1 : 0;
 		search_letter(*argv, 'a') ? atr->a = 1 : 0;
 		search_letter(*argv, 't') ? atr->t = 1 : 0;
 		search_letter(*argv, 'n') ? atr->n = 1 : 0;
 		search_letter(*argv, 'p') ? atr->n = 1 : 0;
+		search_letter(*argv, 'g') ? atr->g = 1 : 0;
 		argv = argv + 1;
 	}
-	if (argv && *argv)
-		atr->f = argv;
-	else
-		atr->f = NULL;
+	atr->f = (argv && *argv ?  argv : NULL);
 	return (atr);
 }
 
 int mmap_file (int argc, char **argv)
 {
-	//printf("%s\n", __func__);
 	int			fd;
 	struct stat	buf;
 	void		*p;
 	t_attr *attributes = NULL;
 
-	if (argc && !(attributes = check_argv(argv + 1)))
+	if (argc && !(attributes = check_argv(argv + 1, NULL)))
 		return (1);
 	if ((fd = open((!attributes->f ? "a.out" : *(attributes->f)), O_RDONLY)) == -1)
 		return (err(ERR_FILE, "No such file or directory"));
@@ -78,7 +87,6 @@ int mmap_file (int argc, char **argv)
 
 int munmap_file(t_save_file f)
 {
-	//printf("%s\n", __func__);
 	if (munmap(f.p, f.size))
 		return (err(ERR_SYS, "munmap: unable to free file displayed in memory"));
 	return (0);
@@ -86,7 +94,6 @@ int munmap_file(t_save_file f)
 
 int check_architecture(void)
 {
-	//printf("%s\n", __func__);
 	uint32_t *magic = NULL;
 
 	if (!(magic = get_struct(0, sizeof(*magic))))

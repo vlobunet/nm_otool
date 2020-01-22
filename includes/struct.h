@@ -26,10 +26,12 @@ typedef struct				s_attr
 	uint8_t					C;
 	uint8_t					I;
 	uint8_t					A;
+	uint8_t					g; // nm | only global symbol
 	uint8_t					n;	// nm | sort by numeric
 	uint8_t					t;	// nm | sort by type
 	uint8_t					a;	// nm | sort by alpha
 	uint8_t					p;	// mn | sort off
+
 	char					**f;
 }							t_attr;
 

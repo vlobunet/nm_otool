@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: vladfom <vladfom@student.42.fr>            +#+  +:+       +#+         #
+#    By: vlobunet <vlobunet@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/10/24 23:40:50 by vlobunet          #+#    #+#              #
-#    Updated: 2019/12/06 11:03:26 by vladfom          ###   ########.fr        #
+#    Updated: 2020/01/22 16:08:51 by vlobunet         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,7 +31,7 @@ SRCS 	= ft_atoi.c ft_putchar.c ft_strlen.c \
 		ft_putstr_fd.c ft_putendl_fd.c ft_putnbr_fd.c \
 		ft_if_space.c ft_intlen.c get_cursor.c ft_strsdel.c \
 		get_host_name.c ft_settolower.c ft_isallnum.c ft_putstrc_fd.c \
-		get_next_line.c
+		get_next_line.c ft_itoabase.c
 
 OBJS	= $(SRCS:.c=.o)
 INC		= includes/

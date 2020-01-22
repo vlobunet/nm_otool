@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vlobunet <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: vlobunet <vlobunet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/26 20:15:33 by vlobunet          #+#    #+#             */
-/*   Updated: 2019/10/26 20:15:36 by vlobunet         ###   ########.fr       */
+/*   Updated: 2020/01/22 16:15:03 by vlobunet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,4 +95,5 @@ char				*ft_settolower(char *crs);
 int					if_isallnum(char *str);
 int					get_next_line(const int fd, char **line);
 void				ft_putstrc_fd(char *color, char *str, int fd);
+char				*ft_itoabase(unsigned long long n, unsigned int base);
 #endif
