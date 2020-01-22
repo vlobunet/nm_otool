@@ -32,7 +32,7 @@ void print_error_atribit_letter(char let)
 
 int		control_attr(char *str, char *valid_letter, int i, int j)
 {
-	// printf("[%s]\n", __func__);
+	//printf("[%s]\n", __func__);
 	int ret;
 
 	if (!str || !*str)
@@ -56,7 +56,7 @@ int		control_attr(char *str, char *valid_letter, int i, int j)
 
 int check_word(char *word)
 {
-	// printf("%s\n", __func__);
+	//printf("%s\n", __func__);
 	int i;
 
 	i = 1;
@@ -74,10 +74,10 @@ int check_word(char *word)
 
 int check_lines(char **argv, uint8_t is_nm)
 {
-	// printf("%s\n", __func__);
+	//printf("%s\n", __func__);
 	while (argv && *argv && *argv[0] == '-')
 	{
-		if (!check_word(*argv) || !control_attr(*argv, "UTBSDCIAant", 1, 0))
+		if (!check_word(*argv) || !control_attr(*argv, "UTBSDCIAantp", 1, 0))
 		{
 			!is_nm ? err(ERR_USAGE, *argv) : err_otool(ERR_USAGE, *argv);
 			return (0);

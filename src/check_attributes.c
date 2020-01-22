@@ -2,6 +2,7 @@
 
 t_attr	*init_array_attributes(void)
 {
+	//printf("%s\n", __func__);
 	t_attr *attr;
 
 	if (!(attr = (t_attr *)malloc(sizeof(t_attr))))
@@ -17,12 +18,14 @@ t_attr	*init_array_attributes(void)
 	attr->a = 0;
 	attr->n = 0;
 	attr->t = 0;
+	attr->p = 0;
 	attr->f = NULL;
 	return (attr);
 }
 
 int		search_letter(char *str, char c)
 {
+	//printf("%s\n", __func__);
 	int i;
 
 	i = 0;
@@ -38,6 +41,7 @@ int		search_letter(char *str, char c)
 
 t_attr	*check_atributes(char **argv)
 {
+	//printf("%s\n", __func__);
 	t_attr	*attr;
 	int		ret;
 

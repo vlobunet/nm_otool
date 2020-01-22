@@ -38,6 +38,7 @@
 
 int main(int argc, char **argv)
 {
+	printf("%s\n", __func__);
 	t_attr *attributes;
 
 	attributes = NULL;

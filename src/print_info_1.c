@@ -1,5 +1,21 @@
 #include "../includes/nm_otool.h"
 
+int print_segment_command(size_t ofset)
+{
+	struct segment_command *seg_cmd;
+	unsigned long cmdsize;
+	char *segname;
+
+	seg_cmd = get_struct(ofset, sizeof(*seg_cmd));
+	if (!seg_cmd)
+		return (err(ERR_SYS, __func__));
+	cmdsize = get_4b(seg_cmd->cmdsize);
+	printf("cmdsize:\t%ld\n", cmdsize);
+	segname = ft_strndup(seg_cmd->segname, 16);
+	printf("segname:\t%s\n", segname);
+	return (0);
+}
+
 void p_m(char *type, char *src)
 {
 	ft_putstr_fd(WHITE, STDOUT);

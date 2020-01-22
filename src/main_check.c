@@ -41,6 +41,7 @@ t_attr *check_argv(char **argv)
 		search_letter(*argv, 'a') ? atr->a = 1 : 0;
 		search_letter(*argv, 't') ? atr->t = 1 : 0;
 		search_letter(*argv, 'n') ? atr->n = 1 : 0;
+		search_letter(*argv, 'p') ? atr->n = 1 : 0;
 		argv = argv + 1;
 	}
 	if (argv && *argv)
