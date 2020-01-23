@@ -22,6 +22,9 @@
 # define STDOUT		1
 # define STDIN		0
 
+# define NM	1
+# define OTOOL 0
+
 #define MH_MAGIC		0xfeedface    /* the mach magic number */
 #define MH_CIGAM		0xcefaedfe    /* NXSwapInt(MH_MAGIC) */
 #define MH_MAGIC_64		0xfeedfacf    /* the 64-bit mach magic number */
@@ -45,6 +48,9 @@
 #define N_SECT	0xe             /* defined in section number n_sect */
 #define N_PBUD	0xc             /* prebound undefined (defined in a dylib) */
 #define N_INDR	0xa             /* indirect */
+
+# define OTOOL_SECTION		"__text"
+# define OTOOL_SEGMENT		"__TEXT"
 
 # define M_MH_OBJECT "MH_OBJECT (Relocatable object file)"
 # define M_MH_EXECUTE "MH_EXECUTE (Demand paged executable file)"

@@ -1,57 +1,59 @@
 #include "../includes/nm_otool.h"
 
-// int ft_ottol_mmap(char *fname)
-// {
-// 	int			fd;
-// 	struct stat	buf;
-// 	void		*p;
+void print_normal_format(char *str)
+{
+	uint16_t len;
+	len = ft_strlen(str);
+	if (len >= 2)
+	{
+		ft_putchar_fd(str[len - 2], STDOUT);
+		ft_putchar_fd(str[len - 1], STDOUT);
+	}
+	else if (len == 1)
+	{
+		ft_putchar_fd('0', STDOUT);
+		ft_putchar_fd(str[0], STDOUT);
+	}
+	else
+		ft_putstr_fd("00", STDOUT);
+	ft_putchar_fd(' ', 1);
+}
 
-// 	if ((fd = open(fname, O_RDONLY)) == -1)
-// 		return (err_otool(ERR_FILE, "No such file or directory"));
-// 	if (fstat(fd, &buf) < 0 || buf.st_mode & S_IFDIR)
-// 		return (err_otool(ERR_FILE, "you can only use MACH-O files."));
-// 	if ((p = mmap(0, buf.st_size, PROT_READ, MAP_PRIVATE, fd, 0)) == MAP_FAILED)
-// 		return (err_otool(ERR_SYS, "mmap: unable to map file to memory"));
-// 	close(fd);
-// 	g_f.p = p;
-// 	g_f.size = buf.st_size;
-// 	g_f.ofset = 0;
-// 	return (0);
-// }
+void print_text_section(uint64_t size, uint64_t offset, char *text)
+{
+	uint64_t i;
+	uint64_t j;
 
-// static int ft_otool_t(char *fname)
-// {
-// 	// static t_lc func_ptr[2];
-
-// 	// func_ptr[0] = &otool_print_sector;
-// 	// func_ptr[1] = &otool_print_sector_64;
-// 	if (ft_ottol_mmap(fname))
-// 		return (1);
-// 	if ((g_f.is_64 = check_architecture()) == -1)
-// 		return (1);
-// 	// if (g_f.is_64)
-// 	// 	main_parser_64(func_ptr[0], LC_SEGMENT_64);
-// 	// else
-// 	// 	main_parser(func_ptr[0], LC_SEGMENT);
-// 	return (0);
-// }
+	g_f.attributes->f ?  ft_putendl_fd(*g_f.attributes->f, STDOUT) :
+	ft_putendl_fd("a.out", STDOUT);
+	ft_putstr_fd("Contents of (__TEXT,__text) section\n", STDOUT);
+	i = 0;
+	while (i < size)
+	{
+		ft_putstr_fd(ft_itoabase(offset + i, 16), STDOUT);
+		ft_putchar_fd('\t', STDOUT);
+		j = 0;
+		while (j < 0x10 && i + j < size)
+			print_normal_format(ft_itoabase(text[i + j++], 16));
+		ft_putchar_fd('\n', STDOUT);
+		i += 0x10;
+	}
+}
 
 int main(int argc, char **argv)
 {
-	printf("%s\n", __func__);
-	t_attr *attributes;
+	static t_cmanager	func_ptr[2];
 
-	attributes = NULL;
-	if (argc && !(attributes = check_atributes(argv + 1)))
+	func_ptr[0] = &segment_manager_x86;
+	func_ptr[1] = &segment_manager_x64;
+
+	if (mmap_file(argc, argv, OTOOL))
+		return(1);
+	if ((g_f.is_64 = check_architecture()) == -1)
 		return (1);
-	// if (attributes->files && !*(attributes->files) && attributes->t)
-	// 	ft_otool_t("a.out");
-	// while (attributes->files && *(attributes->files))
-	// {
-	// 	if (attributes->t)
-	// 		ft_otool_t(*(attributes->files));
-	// 	(attributes->files)++;
-	// }
-	// free(attributes);
+	g_f.is_64 ? main_parser_64(func_ptr[1], LC_SEGMENT_64) :
+	main_parser_86(func_ptr[0], LC_SEGMENT);
+	if (munmap_file(g_f))
+		return (1);
 	return (0);
 }

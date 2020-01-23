@@ -78,9 +78,9 @@ int check_lines(char **argv, uint8_t is_nm)
 	//printf("%s\n", __func__);
 	while (argv && *argv && *argv[0] == '-')
 	{
-		if (!check_word(*argv) || !control_attr(*argv, "UTBSDCIAgantp", 1, 0))
+		if (!check_word(*argv) || !control_attr(*argv, (is_nm ? "UTBSDCIAgantp" : "t"), 1, 0))
 		{
-			!is_nm ? err(ERR_USAGE, *argv) : err_otool(ERR_USAGE, *argv);
+			is_nm ? err(ERR_USAGE, *argv) : err_otool(ERR_USAGE, *argv);
 			return (0);
 		}
 		argv++;

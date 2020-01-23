@@ -39,29 +39,29 @@ int		search_letter(char *str, char c)
 	return (0);
 }
 
-t_attr	*check_atributes(char **argv)
-{
-	//printf("%s\n", __func__);
-	t_attr	*attr;
-	int		ret;
+// t_attr	*check_atributes(char **argv)
+// {
+// 	//printf("%s\n", __func__);
+// 	t_attr	*attr;
+// 	int		ret;
 
-	ret = 0;
-	if (!argv || !*argv)
-		ret = err_otool(ERR_USAGE, "invalid number of attributes");
-	else if (!*argv || *argv[0] != '-' || !check_lines(argv, 1))
-		ret = err_otool(ERR_USAGE, *argv);
-	if (ret)
-		return (NULL);
-	attr = init_array_attributes();
-	while (argv && *argv && *argv[0] == '-')
-	{
-		if (search_letter(*argv, 't'))
-			attr->t = 1;
-		argv = argv + 1;
-	}
-	if (argv && *argv && ((attr->f = argv)))
-		return (attr);
-	err_otool(ERR_USAGE, "invalid number of attributes");
-	free(attr);
-	return (NULL);
-}
+// 	ret = 0;
+// 	if (!argv || !*argv)
+// 		ret = err_otool(ERR_USAGE, "invalid number of attributes");
+// 	else if (!*argv || *argv[0] != '-' || !check_lines(argv, 1))
+// 		ret = err_otool(ERR_USAGE, *argv);
+// 	if (ret)
+// 		return (NULL);
+// 	attr = init_array_attributes();
+// 	while (argv && *argv && *argv[0] == '-')
+// 	{
+// 		if (search_letter(*argv, 't'))
+// 			attr->t = 1;
+// 		argv = argv + 1;
+// 	}
+// 	if (argv && *argv && ((attr->f = argv)))
+// 		return (attr);
+// 	err_otool(ERR_USAGE, "invalid number of attributes");
+// 	free(attr);
+// 	return (NULL);
+// }

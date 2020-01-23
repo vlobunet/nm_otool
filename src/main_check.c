@@ -37,9 +37,9 @@ int	err(const int err, const char *str)
 	return (1);
 }
 
-t_attr *check_argv(char **argv, t_attr *atr)
+t_attr *check_argv(char **argv, t_attr *atr, uint8_t is_nm)
 {
-	if (argv && *argv && *argv[0] == '-' && !check_lines(argv, 0))
+	if (argv && *argv && *argv[0] == '-' && !check_lines(argv, is_nm))
 		return (NULL);
 	atr = init_array_attributes();
 	while (argv && *argv && *argv[0] == '-')
@@ -57,19 +57,26 @@ t_attr *check_argv(char **argv, t_attr *atr)
 		search_letter(*argv, 'g') ? atr->g = 1 : 0;
 		argv = argv + 1;
 	}
+	if (!atr->t && !is_nm)
+		return (atr);
 	atr->f = (argv && *argv ?  argv : NULL);
 	return (atr);
 }
 
-int mmap_file (int argc, char **argv)
+int mmap_file (int argc, char **argv, uint8_t is_nm)
 {
 	int			fd;
 	struct stat	buf;
 	void		*p;
 	t_attr *attributes = NULL;
 
-	if (argc && !(attributes = check_argv(argv + 1, NULL)))
+	if (argc && !(attributes = check_argv(argv + 1, NULL, is_nm)))
 		return (1);
+	if (!is_nm && !attributes->t)
+	{
+		free(attributes);
+		return (err_otool(ERR_USAGE, "invalid number attributes"));
+	}
 	if ((fd = open((!attributes->f ? "a.out" : *(attributes->f)), O_RDONLY)) == -1)
 		return (err(ERR_FILE, "No such file or directory"));
 	if (fstat(fd, &buf) < 0 || buf.st_mode & S_IFDIR)
