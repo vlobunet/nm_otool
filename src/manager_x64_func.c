@@ -1,6 +1,6 @@
 #include "../includes/nm_otool.h"
 
-static void push(t_sym *symbol, t_sym **lst)
+static void	push(t_sym *symbol, t_sym **lst)
 {
 	if (*lst && symbol)
 	{
@@ -10,17 +10,18 @@ static void push(t_sym *symbol, t_sym **lst)
 	*lst = symbol;
 }
 
-char	get_type_64(const uint64_t n_value, struct nlist_64 *nlist_64, const uint16_t n_desc)
+char		get_type_64(const uint64_t n_value, struct nlist_64 *nlist_64,
+						const uint16_t n_desc)
 {
-	char		type = '?';
+	char	type;
 
+	type = '?';
 	(N_STAB & nlist_64->n_type) ? type = '-' : 0;
 	if ((N_TYPE & nlist_64->n_type) == N_UNDF)
 		type = n_value ? 'c' : 'u';
 	((N_TYPE & nlist_64->n_type) == N_ABS) ? type = 'a' : 0;
 	if ((N_TYPE & nlist_64->n_type) == N_SECT &&
-		!(type = sections_character_table(FIRST_BIT_ON_64 |
-			nlist_64->n_sect)))
+		!(type = char_table(FIRST_BIT_ON_64 | nlist_64->n_sect)))
 		type = '?';
 	((N_TYPE & nlist_64->n_type) == N_PBUD) ? type = 'u' : 0;
 	((N_TYPE & nlist_64->n_type) == N_INDR) ? type = 'i' : 0;
@@ -29,19 +30,21 @@ char	get_type_64(const uint64_t n_value, struct nlist_64 *nlist_64, const uint16
 	return (type);
 }
 
-void push_nlist_64(struct nlist_64 *nlist_64, uint64_t value, struct symtab_command *symc)
+void		push_nlist_64(struct nlist_64 *nlist_64, uint64_t value,
+							struct symtab_command *symc)
 {
 	uint32_t	off;
 	uint32_t	size;
 	uint32_t	stroff;
 	t_sym		*symbol;
 
-	symbol = (t_sym *)malloc(sizeof(t_sym));
 	off = get_4b(symc->stroff);
 	size = get_4b(symc->strsize);
 	stroff = off + get_4b(nlist_64->n_un.n_strx);
-	if (!check_symbol_type(get_type_64(value, nlist_64, get_2b(nlist_64->n_desc))))
+	if (!check_type(get_type_64(value, nlist_64,
+		get_2b(nlist_64->n_desc))))
 		return ;
+	symbol = (t_sym *)malloc(sizeof(t_sym));
 	symbol->size = off + size - stroff;
 	symbol->str = get_struct(stroff, symbol->size);
 	symbol->type = get_type_64(value, nlist_64, get_2b(nlist_64->n_desc));
@@ -53,9 +56,9 @@ void push_nlist_64(struct nlist_64 *nlist_64, uint64_t value, struct symtab_comm
 	push(symbol, &(g_f.lstsym));
 }
 
-int symtab_manager_64(size_t ofset)
+int			symtab_manager_64(size_t ofset)
 {
-	t_cymmanager m;
+	t_cymmanager	m;
 
 	if (!(m.sym_cmd = get_struct(ofset, sizeof(*(m.sym_cmd)))))
 		return (err(ERR_SYS, __func__));
@@ -77,21 +80,19 @@ int symtab_manager_64(size_t ofset)
 	return (0);
 }
 
-int main_parser_64(t_cmanager ptr_func, uint32_t type)
+int			main_parser_64(t_cmanager ptr_func, uint32_t type)
 {
-	t_manager m;
+	t_manager	m;
 
 	m.ofset = sizeof(struct mach_header_64);
 	if (!(m.hdr_64 = get_struct(0, sizeof(*(m.hdr_64)))))
 		return (err(ERR_SYS, __func__));
 	m.ncmds = get_4b(m.hdr_64->ncmds);
-	//print_hdr_info(m.hdr_64->magic, m.hdr_64->filetype);
 	if (!(m.lc = get_struct(m.ofset, sizeof(*(m.lc)))))
 		return (err(ERR_SYS, __func__));
 	while (m.ncmds--)
 	{
 		m.cmd_type = get_4b(m.lc->cmd);
-		//print_load_command_sector(m.cmd_type);
 		if (m.cmd_type == type)
 			ptr_func(m.ofset);
 		m.ofset = m.ofset + get_4b(m.lc->cmdsize);

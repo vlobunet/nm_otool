@@ -2,8 +2,7 @@
 
 t_attr	*init_array_attributes(void)
 {
-	//printf("%s\n", __func__);
-	t_attr *attr;
+	t_attr	*attr;
 
 	if (!(attr = (t_attr *)malloc(sizeof(t_attr))))
 		return (NULL);
@@ -25,8 +24,7 @@ t_attr	*init_array_attributes(void)
 
 int		search_letter(char *str, char c)
 {
-	//printf("%s\n", __func__);
-	int i;
+	int	i;
 
 	i = 0;
 	while (str && str[i])
@@ -39,29 +37,40 @@ int		search_letter(char *str, char c)
 	return (0);
 }
 
-// t_attr	*check_atributes(char **argv)
-// {
-// 	//printf("%s\n", __func__);
-// 	t_attr	*attr;
-// 	int		ret;
+void	print_other(void)
+{
+	ft_putstr_fd("\t-U -- Display symbols only U/u type.\n", STDERR);
+	ft_putstr_fd("\t-T -- Display symbols only T/t type.\n", STDERR);
+	ft_putstr_fd("\t-B -- Display symbols only B/b type.\n", STDERR);
+	ft_putstr_fd("\t-S -- Display symbols only S/s type.\n", STDERR);
+	ft_putstr_fd("\t-D -- Display symbols only D/d type.\n", STDERR);
+	ft_putstr_fd("\t-C -- Display symbols only C/c type.\n", STDERR);
+	ft_putstr_fd("\t-A -- Display symbols only A/a type.\n", STDERR);
+	ft_putstr_fd("\t-g -- Display only global symbol\n", STDERR);
+	ft_putstr_fd("\t-a -- Sort by name (alphabet)(default)\n", STDERR);
+	ft_putstr_fd("\t-n -- Sort by offset\n", STDERR);
+	ft_putstr_fd("\t-t -- Sort by type\n", STDERR);
+	ft_putstr_fd("\t-p -- Display as in the symbol table (no sort)\n", STDERR);
+}
 
-// 	ret = 0;
-// 	if (!argv || !*argv)
-// 		ret = err_otool(ERR_USAGE, "invalid number of attributes");
-// 	else if (!*argv || *argv[0] != '-' || !check_lines(argv, 1))
-// 		ret = err_otool(ERR_USAGE, *argv);
-// 	if (ret)
-// 		return (NULL);
-// 	attr = init_array_attributes();
-// 	while (argv && *argv && *argv[0] == '-')
-// 	{
-// 		if (search_letter(*argv, 't'))
-// 			attr->t = 1;
-// 		argv = argv + 1;
-// 	}
-// 	if (argv && *argv && ((attr->f = argv)))
-// 		return (attr);
-// 	err_otool(ERR_USAGE, "invalid number of attributes");
-// 	free(attr);
-// 	return (NULL);
-// }
+int		err(const int err, const char *str)
+{
+	static const char	*msg[ERR_NUMBER] =
+	{
+		"Fatal Error: ",
+		"Bad usage: ",
+		"Bad file: ",
+	};
+
+	ft_putstr_fd(RED, STDERR);
+	ft_putstr_fd(msg[err], STDERR);
+	ft_putstr_fd(RES, STDERR);
+	ft_putstr_fd(str, STDERR);
+	ft_putstr_fd("\n", STDERR);
+	if (err == ERR_USAGE)
+	{
+		ft_putstr_fd("usage: ./ft_nm [-UTBSDCIAgantp] <files> \n", STDERR);
+		print_other();
+	}
+	return (1);
+}

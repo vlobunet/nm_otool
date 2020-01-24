@@ -1,6 +1,6 @@
 #include "../includes/nm_otool.h"
 
-void set_symbol(t_sym **cur)
+void		set_symbol(t_sym **cur)
 {
 	if ((*cur)->p)
 		(*cur)->p->n = (*cur)->n;
@@ -10,7 +10,7 @@ void set_symbol(t_sym **cur)
 	(*cur)->n = NULL;
 }
 
-static void push(t_sym *symbol, t_sym **lst)
+static void	push(t_sym *symbol, t_sym **lst)
 {
 	if (*lst && symbol)
 	{
@@ -20,7 +20,20 @@ static void push(t_sym *symbol, t_sym **lst)
 	*lst = symbol;
 }
 
-void sorted_symbol(t_sym *min, t_sym *cur, t_sym *sorted, int f)
+void		lst_dell(t_sym *lst)
+{
+	t_sym *cur;
+
+	while (lst && lst->n)
+	{
+		cur = lst;
+		lst = lst->n;
+		free(cur);
+	}
+	free(lst);
+}
+
+void		sorted_symbol(t_sym *min, t_sym *cur, t_sym *sorted, int f)
 {
 	while (cur)
 	{
@@ -42,9 +55,10 @@ void sorted_symbol(t_sym *min, t_sym *cur, t_sym *sorted, int f)
 	while (sorted && sorted->p)
 		sorted = sorted->p;
 	print_lst(sorted);
+	lst_dell(sorted);
 }
 
-void lst_sort(void)
+void		lst_sort(void)
 {
 	while (g_f.lstsym && g_f.lstsym->p)
 		g_f.lstsym = g_f.lstsym->p;
@@ -56,4 +70,6 @@ void lst_sort(void)
 		sorted_symbol(g_f.lstsym, g_f.lstsym, NULL, 2);
 	else
 		sorted_symbol(g_f.lstsym, g_f.lstsym, NULL, 3);
+	lst_dell(g_f.lstsym);
+	free(g_f.attributes);
 }

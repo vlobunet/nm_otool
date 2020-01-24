@@ -1,7 +1,6 @@
 #include "../includes/nm_otool.h"
 
-
-int otool_print_sector_64(size_t start_offset)
+int		otool_print_sector_64(size_t start_offset)
 {
 	struct section_64	*sect_64;
 	char				*text;
@@ -14,7 +13,7 @@ int otool_print_sector_64(size_t start_offset)
 	return (1);
 }
 
-int segment_manager_x64(size_t start_offset)
+int		segment_manager_x64(size_t start_offset)
 {
 	struct segment_command_64	*seg_x64;
 	struct section_64			*sect_64;

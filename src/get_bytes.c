@@ -1,13 +1,13 @@
 #include "../includes/nm_otool.h"
 
-uint16_t			get_2b(uint16_t n)
+uint16_t	get_2b(uint16_t n)
 {
 	if (g_f.is_64)
 		return ((n >> 8) | (n << 8));
 	return (n);
 }
 
-uint32_t			get_4b(uint32_t n)
+uint32_t	get_4b(uint32_t n)
 {
 	if (!g_f.is_64)
 		return ((n >> 24) | ((n & 0xff0000) >> 8) | \
@@ -15,7 +15,7 @@ uint32_t			get_4b(uint32_t n)
 	return (n);
 }
 
-uint64_t			get_8b(uint64_t n)
+uint64_t	get_8b(uint64_t n)
 {
 	if (!g_f.is_64)
 		return ((n & 0xff00000000000000) >> 56 \
@@ -29,7 +29,7 @@ uint64_t			get_8b(uint64_t n)
 	return (n);
 }
 
-void *get_struct(const uint64_t offset, const size_t size)
+void		*get_struct(const uint64_t offset, const size_t size)
 {
 	if (offset + size < offset)
 		return (NULL);

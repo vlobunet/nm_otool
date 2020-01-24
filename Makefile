@@ -6,7 +6,7 @@ CC = gcc
 
 CFLAGS = -Wall -Wextra -Werror # -fsanitize=address,undefined
 
-COMMON_SRC = print_info_1.c get_bytes.c print_error_attrlett.c \
+COMMON_SRC = get_bytes.c print_error_attrlett.c \
 			check_attributes.c main_check.c manager_x86_func.c \
 			manager_x64_func.c section_character_table.c
 

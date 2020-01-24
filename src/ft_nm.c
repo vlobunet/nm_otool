@@ -1,8 +1,8 @@
 #include "../includes/nm_otool.h"
 
-void print_lst(t_sym *sort)
+void	print_lst(t_sym *sort)
 {
-	char *ret;
+	char	*ret;
 
 	while (sort)
 	{
@@ -29,13 +29,14 @@ void print_lst(t_sym *sort)
 	}
 }
 
-int main(int argc, char **argv)
+int		main(int argc, char **argv)
 {
 	static t_cmanager	func_ptr[3];
 
 	func_ptr[0] = &segment_manager;
 	func_ptr[1] = &symtab_manager_86;
 	func_ptr[2] = &symtab_manager_64;
+
 	if (mmap_file(argc, argv, NM))
 		return(1);
 	if ((g_f.is_64 = check_architecture()) == -1)

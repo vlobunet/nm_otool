@@ -12,9 +12,6 @@
 # include <mach-o/fat.h>
 # include <mach-o/nlist.h>
 
-
-#include <stdio.h>
-
 void		print_load_command_sector(uint32_t c);
 void		print_hdr_info(uint32_t hdr_magic, uint32_t hdr_filetype);
 void		p_m(char *type, char *src);
@@ -27,8 +24,8 @@ int			err_otool(const int err, const char *str);
 int mmap_file (int argc, char **argv, uint8_t is_nm);
 int			munmap_file(t_save_file f);
 
-int			check_symbol_type(char c);
-char		sections_character_table(const size_t offset);
+int			check_type(char c);
+char		char_table(const size_t offset);
 
 int			main_parser_86(t_cmanager ptr_func, uint32_t type);
 int			symtab_manager_86(size_t ofset);
