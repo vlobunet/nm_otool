@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_nm.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vlobunet <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: vlobunet <vlobunet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/27 19:38:38 by vlobunet          #+#    #+#             */
-/*   Updated: 2020/01/27 19:38:39 by vlobunet         ###   ########.fr       */
+/*   Updated: 2020/01/28 00:27:23 by vlobunet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,31 @@ void	print_lst(t_sym *sort)
 	}
 }
 
+int manager_fat(t_fmanager func_ptr)
+{
+	static t_cmanager	func_cmanager[3];
+	struct fat_header	*hdr;
+	size_t				off;
+	uint32_t			magic;
+
+	off = 0;
+	func_cmanager[0] = &segment_manager;
+	func_cmanager[1] = &symtab_manager_86;
+	func_cmanager[2] = &symtab_manager_64;
+	if (!(hdr = get_struct(0, sizeof(*hdr))))
+		return (err(ERR_FILE, "missing fat header"));
+	if (!func_ptr(get_4b(hdr->nfat_arch), sizeof(*hdr), &off, &magic))
+		return (err(ERR_SYS, __func__));
+	if (!off)
+		return (err(ERR_FILE, "no known architectures found"));
+	g_f.ofset = off;
+	!g_f.is_64 ? main_parser_86(func_cmanager[0], LC_SEGMENT) :
+	main_parser_64(func_cmanager[0], LC_SEGMENT_64);
+	!g_f.is_64 ? main_parser_86(func_cmanager[1], LC_SYMTAB) :
+	main_parser_64(func_cmanager[2], LC_SYMTAB);
+	return (1);
+}
+
 int		main_run(void)
 {
 	static t_cmanager	func_cmanager[3];
@@ -54,8 +79,10 @@ int		main_run(void)
 
 	g_f.type == 1 ? main_parser_86(func_cmanager[0], LC_SEGMENT) : 0;
 	g_f.type == 1 ? main_parser_86(func_cmanager[1], LC_SYMTAB) : 0;
+
 	g_f.type == 2 ? main_parser_64(func_cmanager[0], LC_SEGMENT_64) : 0;
 	g_f.type == 2 ? main_parser_64(func_cmanager[2], LC_SYMTAB) : 0;
+
 	g_f.type == 3 ? manager_fat(func_fmanager[0]): 0;
 	g_f.type == 4 ? manager_fat(func_fmanager[1]): 0;
 	return (0);

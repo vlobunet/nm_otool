@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   struct.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vlobunet <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: vlobunet <vlobunet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/27 19:28:40 by vlobunet          #+#    #+#             */
-/*   Updated: 2020/01/27 19:28:42 by vlobunet         ###   ########.fr       */
+/*   Updated: 2020/01/28 00:25:27 by vlobunet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ typedef struct				s_attr
 typedef struct				s_save_file
 {
 	int						is_64;
-	int				type;
+	int						type;
 	void					*p;
 	struct mach_header		hdr;
 	struct mach_header_64	hdr_64;
