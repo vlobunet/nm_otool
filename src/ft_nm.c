@@ -41,21 +41,33 @@ void	print_lst(t_sym *sort)
 	}
 }
 
+int		main_run(void)
+{
+	static t_cmanager	func_cmanager[3];
+	static t_fmanager	func_fmanager[2];
+
+	func_cmanager[0] = &segment_manager;
+	func_cmanager[1] = &symtab_manager_86;
+	func_cmanager[2] = &symtab_manager_64;
+	func_fmanager[0] = &fat_manager_86;
+	func_fmanager[1] = &fat_manager_64;
+
+	g_f.type == 1 ? main_parser_86(func_cmanager[0], LC_SEGMENT) : 0;
+	g_f.type == 1 ? main_parser_86(func_cmanager[1], LC_SYMTAB) : 0;
+	g_f.type == 2 ? main_parser_64(func_cmanager[0], LC_SEGMENT_64) : 0;
+	g_f.type == 2 ? main_parser_64(func_cmanager[2], LC_SYMTAB) : 0;
+	g_f.type == 3 ? manager_fat(func_fmanager[0]): 0;
+	g_f.type == 4 ? manager_fat(func_fmanager[1]): 0;
+	return (0);
+}
+
 int		main(int argc, char **argv)
 {
-	static t_cmanager	func_ptr[3];
-
-	func_ptr[0] = &segment_manager;
-	func_ptr[1] = &symtab_manager_86;
-	func_ptr[2] = &symtab_manager_64;
 	if (mmap_file(argc, argv, NM))
 		return (1);
-	if ((g_f.is_64 = check_architecture()) == -1)
+	if ((g_f.type = check_architecture()) == 0)
 		return (1);
-	g_f.is_64 ? main_parser_64(func_ptr[0], LC_SEGMENT_64) :
-	main_parser_86(func_ptr[0], LC_SEGMENT);
-	g_f.is_64 ? main_parser_64(func_ptr[2], LC_SYMTAB) :
-	main_parser_86(func_ptr[1], LC_SYMTAB);
+	main_run();
 	lst_sort();
 	if (munmap_file(g_f))
 		return (1);

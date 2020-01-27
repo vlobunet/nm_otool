@@ -8,7 +8,7 @@ CFLAGS = -Wall -Wextra -Werror # -fsanitize=address,undefined
 
 COMMON_SRC = get_bytes.c print_error_attrlett.c \
 			check_attributes.c main_check.c manager_x86_func.c \
-			manager_x64_func.c section_character_table.c
+			manager_x64_func.c section_character_table.c fat_manager.c
 
 NM_SRC = ft_nm.c sorted_func.c ${COMMON_SRC}
 
@@ -93,5 +93,6 @@ re: fclean all
 build: libft ${NM_OBJ} ${OTOOL_OBJ}
 
 ############################## DECORATION ######################################
-
+#usr/lib/*.dylib
+#/usr/bin/python
 .PHONY: all clean fclean re

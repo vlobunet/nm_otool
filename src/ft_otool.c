@@ -72,6 +72,5 @@ int		main(int argc, char **argv)
 	if (munmap_file(g_f))
 		return (1);
 	free(g_f.attributes);
-	system("leaks ft_otool");
 	return (0);
 }

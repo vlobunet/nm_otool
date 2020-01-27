@@ -50,6 +50,7 @@ typedef struct				s_attr
 typedef struct				s_save_file
 {
 	int						is_64;
+	int				type;
 	void					*p;
 	struct mach_header		hdr;
 	struct mach_header_64	hdr_64;
@@ -102,5 +103,6 @@ typedef struct				s_cymmanager
 
 typedef void	(*t_lc)(const size_t);
 typedef int		(*t_cmanager)(size_t start_offset);
+typedef int		(*t_fmanager)(uint32_t, size_t, size_t*, uint32_t*);
 
 #endif

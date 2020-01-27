@@ -73,20 +73,29 @@ int		munmap_file(t_save_file f)
 		return (err(ERR_SYS, "Unable to free file displayed in memory"));
 	return (0);
 }
+#include <stdio.h>
 
 int		check_architecture(void)
 {
 	uint32_t	*magic;
+	int			type;
 
+	type = 0;
 	if (!(magic = get_struct(0, sizeof(*magic))))
 	{
 		err(ERR_SYS, "unable magic");
-		return (-1);
+		return (type);
 	}
-	if (*magic == MH_CIGAM || *magic == MH_MAGIC)
-		return (0);
-	if (*magic == MH_CIGAM_64 || *magic == MH_MAGIC_64)
-		return (1);
-	err(ERR_FILE, "unknown format");
-	return (-1);
+	*magic == MH_CIGAM || *magic == MH_MAGIC ? type = 1 : 0;
+	*magic == MH_CIGAM_64 || *magic == MH_MAGIC_64 ? type = 2 : 0;
+	*magic == FAT_MAGIC || *magic == FAT_CIGAM ? type = 3 : 0;
+	*magic == FAT_MAGIC_64 || *magic == FAT_CIGAM_64 ? type = 4 : 0;
+	*magic == ARCHIVE_MAGIC || *magic == ARCHIVE_CIGAM ? type = 5 : 0;
+	type == 3 || type == 1 ? g_f.is_64 = 0 : 0;
+	type == 2 || type == 4 ? g_f.is_64 = 1 : 0;
+	if (!type)
+		err(ERR_FILE, "unknown format");
+	return (type);
+
+		
 }
