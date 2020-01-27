@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   check_attributes.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlobunet <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/01/27 19:35:05 by vlobunet          #+#    #+#             */
+/*   Updated: 2020/01/27 19:35:07 by vlobunet         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/nm_otool.h"
 
 t_attr	*init_array_attributes(void)
@@ -6,14 +18,14 @@ t_attr	*init_array_attributes(void)
 
 	if (!(attr = (t_attr *)malloc(sizeof(t_attr))))
 		return (NULL);
-	attr->U = 0;
-	attr->T = 0;
-	attr->B = 0;
-	attr->S = 0;
-	attr->D = 0;
-	attr->C = 0;
-	attr->I = 0;
-	attr->A = 0;
+	attr->au = 0;
+	attr->at = 0;
+	attr->ab = 0;
+	attr->as = 0;
+	attr->ad = 0;
+	attr->ac = 0;
+	attr->ai = 0;
+	attr->aa = 0;
 	attr->a = 0;
 	attr->n = 0;
 	attr->t = 0;
@@ -55,13 +67,11 @@ void	print_other(void)
 
 int		err(const int err, const char *str)
 {
-	static const char	*msg[ERR_NUMBER] =
-	{
-		"Fatal Error: ",
-		"Bad usage: ",
-		"Bad file: ",
-	};
+	static const char	*msg[ERR_NUMBER];
 
+	msg[0] = "Fatal Error: ";
+	msg[1] = "Bad usage: ";
+	msg[2] = "Bad file: ";
 	ft_putstr_fd(RED, STDERR);
 	ft_putstr_fd(msg[err], STDERR);
 	ft_putstr_fd(RES, STDERR);

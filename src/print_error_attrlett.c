@@ -1,14 +1,24 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   print_error_attrlett.c                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlobunet <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/01/27 19:46:48 by vlobunet          #+#    #+#             */
+/*   Updated: 2020/01/27 19:46:50 by vlobunet         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/nm_otool.h"
 
 int		err_otool(const int err, const char *str)
 {
-	static const char	*msg[ERR_NUMBER] =
-	{
-		"Fatal Error: ",
-		"Bad usage: ",
-		"Bad file: ",
-	};
+	static const char	*msg[ERR_NUMBER];
 
+	msg[0] = "Fatal Error: ";
+	msg[1] = "Bad usage: ";
+	msg[2] = "Bad file: ";
 	ft_putstr_fd(RED, STDERR);
 	ft_putstr_fd(msg[err], STDERR);
 	ft_putstr_fd(RES, STDERR);
@@ -20,7 +30,7 @@ int		err_otool(const int err, const char *str)
 	}
 	return (1);
 }
-		
+
 void	print_error_atribit_letter(char let)
 {
 	ft_putstr_fd(RED, STDERR);
@@ -67,8 +77,6 @@ int		check_word(char *word)
 			return (0);
 	return (1);
 }
-
-
 
 int		check_lines(char **argv, uint8_t is_nm)
 {

@@ -1,5 +1,17 @@
-#ifndef _STRUCT_H_
-# define _STRUCT_H_
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   struct.h                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlobunet <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/01/27 19:28:40 by vlobunet          #+#    #+#             */
+/*   Updated: 2020/01/27 19:28:42 by vlobunet         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef STRUCT_H
+# define STRUCT_H
 
 # include "nm_otool.h"
 # include <mach-o/loader.h>
@@ -18,19 +30,19 @@ typedef struct				s_sym
 
 typedef struct				s_attr
 {
-	uint8_t					U;	// nm | U symbol type
-	uint8_t					T;	// nm | T/t symbol type
-	uint8_t					B;	// nm | B/b symbol type
-	uint8_t					S;	// nm | S/s symbol type
-	uint8_t					D;	// nm | D/d symbol type
-	uint8_t					C;
-	uint8_t					I;
-	uint8_t					A;
-	uint8_t					g; // nm | only global symbol
-	uint8_t					n;	// nm | sort by numeric
-	uint8_t					t;	// nm | sort by type
-	uint8_t					a;	// nm | sort by alpha
-	uint8_t					p;	// mn | sort off
+	uint8_t					au;
+	uint8_t					at;
+	uint8_t					ab;
+	uint8_t					as;
+	uint8_t					ad;
+	uint8_t					ac;
+	uint8_t					ai;
+	uint8_t					aa;
+	uint8_t					g;
+	uint8_t					n;
+	uint8_t					t;
+	uint8_t					a;
+	uint8_t					p;
 
 	char					**f;
 }							t_attr;

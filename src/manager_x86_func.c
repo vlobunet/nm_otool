@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   manager_x86_func.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlobunet <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/01/27 19:44:34 by vlobunet          #+#    #+#             */
+/*   Updated: 2020/01/27 19:44:35 by vlobunet         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/nm_otool.h"
 
 static void	push(t_sym *symbol, t_sym **lst)
@@ -33,8 +45,8 @@ char		get_type_86(const uint64_t n_value, struct nlist *nlist,
 void		push_nlist_86(struct nlist *nlist, unsigned long value,
 					struct symtab_command *symc)
 {
-	uint32_t 	off;
-	uint32_t 	size;
+	uint32_t	off;
+	uint32_t	size;
 	uint32_t	stroff;
 	t_sym		*symbol;
 
@@ -57,7 +69,7 @@ void		push_nlist_86(struct nlist *nlist, unsigned long value,
 
 int			symtab_manager_86(size_t ofset)
 {
-	t_cymmanager m;
+	t_cymmanager	m;
 
 	if (!(m.sym_cmd = get_struct(ofset, sizeof(*(m.sym_cmd)))))
 		return (err(ERR_SYS, __func__));
@@ -78,7 +90,6 @@ int			symtab_manager_86(size_t ofset)
 	}
 	return (0);
 }
-
 
 int			main_parser_86(t_cmanager ptr_func, uint32_t type)
 {

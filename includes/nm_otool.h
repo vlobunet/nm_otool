@@ -1,5 +1,17 @@
-#ifndef _NM_OTOOL_H_
-# define _NM_OTOOL_H_
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   nm_otool.h                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlobunet <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/01/27 19:27:00 by vlobunet          #+#    #+#             */
+/*   Updated: 2020/01/27 19:27:03 by vlobunet         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef NM_OTOOL_H
+# define NM_OTOOL_H
 
 # include "../libft/includes/libft.h"
 # include "defines.h"
@@ -18,10 +30,10 @@ void		p_m(char *type, char *src);
 
 int			check_architecture(void);
 t_attr		*check_atributes(char **argv);
-int check_lines(char **argv, uint8_t is_nm);
+int			check_lines(char **argv, uint8_t is_nm);
 int			err(const int err, const char *str);
 int			err_otool(const int err, const char *str);
-int mmap_file (int argc, char **argv, uint8_t is_nm);
+int			mmap_file (int argc, char **argv, uint8_t is_nm);
 int			munmap_file(t_save_file f);
 
 int			check_type(char c);
@@ -55,13 +67,13 @@ void		lst_sort(void);
 void		sorted_symbol(t_sym *min, t_sym *cur, t_sym *sorted, int f);
 void		print_lst(t_sym *sort);
 
-int segment_manager(size_t start_offset);
+int			segment_manager(size_t start_offset);
 
-int segment_manager_x86(size_t start_offset);
-int otool_print_sector_x86(size_t start_offset);
-int segment_manager_x64(size_t start_offset);
-int otool_print_sector_64(size_t start_offset);
+int			segment_manager_x86(size_t start_offset);
+int			otool_print_sector_x86(size_t start_offset);
+int			segment_manager_x64(size_t start_offset);
+int			otool_print_sector_64(size_t start_offset);
 
-void print_text_section(uint64_t size, uint64_t offset, char *text);
+void		print_text_section(uint64_t size, uint64_t offset, char *text);
 
 #endif

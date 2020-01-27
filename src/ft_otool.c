@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_otool.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlobunet <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/01/27 19:39:16 by vlobunet          #+#    #+#             */
+/*   Updated: 2020/01/27 19:39:18 by vlobunet         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/nm_otool.h"
 
 void	print_normal_format(char *str)
@@ -24,7 +36,7 @@ void	print_normal_format(char *str)
 void	print_text_section(uint64_t size, uint64_t offset, char *text)
 {
 	uint64_t	i;
-	uint64_t 	j;
+	uint64_t	j;
 	char		*adr;
 
 	g_f.attributes->f ? ft_putendl_fd(*g_f.attributes->f, STDOUT) :
@@ -52,7 +64,7 @@ int		main(int argc, char **argv)
 	func_ptr[0] = &segment_manager_x86;
 	func_ptr[1] = &segment_manager_x64;
 	if (mmap_file(argc, argv, OTOOL))
-		return(1);
+		return (1);
 	if ((g_f.is_64 = check_architecture()) == -1)
 		return (1);
 	g_f.is_64 ? main_parser_64(func_ptr[1], LC_SEGMENT_64) :
@@ -60,5 +72,6 @@ int		main(int argc, char **argv)
 	if (munmap_file(g_f))
 		return (1);
 	free(g_f.attributes);
+	system("leaks ft_otool");
 	return (0);
 }

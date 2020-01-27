@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_nm.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlobunet <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/01/27 19:38:38 by vlobunet          #+#    #+#             */
+/*   Updated: 2020/01/27 19:38:39 by vlobunet         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/nm_otool.h"
 
 void	print_lst(t_sym *sort)
@@ -6,7 +18,7 @@ void	print_lst(t_sym *sort)
 
 	while (sort)
 	{
-		if (g_f.attributes->A)
+		if (g_f.attributes->aa)
 		{
 			g_f.attributes->f ? ft_putstr_fd(*g_f.attributes->f, STDOUT) :
 			ft_putstr_fd("a.out", STDOUT);
@@ -36,9 +48,8 @@ int		main(int argc, char **argv)
 	func_ptr[0] = &segment_manager;
 	func_ptr[1] = &symtab_manager_86;
 	func_ptr[2] = &symtab_manager_64;
-
 	if (mmap_file(argc, argv, NM))
-		return(1);
+		return (1);
 	if ((g_f.is_64 = check_architecture()) == -1)
 		return (1);
 	g_f.is_64 ? main_parser_64(func_ptr[0], LC_SEGMENT_64) :
@@ -48,5 +59,6 @@ int		main(int argc, char **argv)
 	lst_sort();
 	if (munmap_file(g_f))
 		return (1);
+	system("leaks ft_nm");
 	return (0);
 }

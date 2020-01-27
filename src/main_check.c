@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main_check.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlobunet <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/01/27 19:42:13 by vlobunet          #+#    #+#             */
+/*   Updated: 2020/01/27 19:42:14 by vlobunet         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/nm_otool.h"
 
 t_attr	*check_argv(char **argv, t_attr *atr, uint8_t is_nm)
@@ -7,12 +19,12 @@ t_attr	*check_argv(char **argv, t_attr *atr, uint8_t is_nm)
 	atr = init_array_attributes();
 	while (argv && *argv && *argv[0] == '-')
 	{
-		search_letter(*argv, 'U') ? atr->U = 1 : 0;
-		search_letter(*argv, 'T') ? atr->T = 1 : 0;
-		search_letter(*argv, 'B') ? atr->B = 1 : 0;
-		search_letter(*argv, 'S') ? atr->S = 1 : 0;
-		search_letter(*argv, 'D') ? atr->D = 1 : 0;
-		search_letter(*argv, 'A') ? atr->A = 1 : 0;
+		search_letter(*argv, 'U') ? atr->au = 1 : 0;
+		search_letter(*argv, 'T') ? atr->at = 1 : 0;
+		search_letter(*argv, 'B') ? atr->ab = 1 : 0;
+		search_letter(*argv, 'S') ? atr->as = 1 : 0;
+		search_letter(*argv, 'D') ? atr->ad = 1 : 0;
+		search_letter(*argv, 'A') ? atr->aa = 1 : 0;
 		search_letter(*argv, 'a') ? atr->a = 1 : 0;
 		search_letter(*argv, 't') ? atr->t = 1 : 0;
 		search_letter(*argv, 'n') ? atr->n = 1 : 0;
@@ -22,11 +34,11 @@ t_attr	*check_argv(char **argv, t_attr *atr, uint8_t is_nm)
 	}
 	if (!atr->t && !is_nm)
 		return (atr);
-	atr->f = (argv && *argv ?  argv : NULL);
+	atr->f = (argv && *argv ? argv : NULL);
 	return (atr);
 }
 
-int		mmap_file (int argc, char **argv, uint8_t is_nm)
+int		mmap_file(int argc, char **argv, uint8_t is_nm)
 {
 	int			fd;
 	struct stat	buf;
@@ -69,7 +81,7 @@ int		check_architecture(void)
 	if (!(magic = get_struct(0, sizeof(*magic))))
 	{
 		err(ERR_SYS, "unable magic");
-		return(-1);
+		return (-1);
 	}
 	if (*magic == MH_CIGAM || *magic == MH_MAGIC)
 		return (0);

@@ -1,5 +1,17 @@
-#ifndef _DEFINES_H_
-# define _DEFINES_H_
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   defines.h                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlobunet <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/01/27 19:23:54 by vlobunet          #+#    #+#             */
+/*   Updated: 2020/01/27 19:23:57 by vlobunet         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef DEFINES_H
+# define DEFINES_H
 
 # include "nm_otool.h"
 
@@ -25,29 +37,29 @@
 # define NM	1
 # define OTOOL 0
 
-#define MH_MAGIC		0xfeedface    /* the mach magic number */
-#define MH_CIGAM		0xcefaedfe    /* NXSwapInt(MH_MAGIC) */
-#define MH_MAGIC_64		0xfeedfacf    /* the 64-bit mach magic number */
-#define MH_CIGAM_64		0xcffaedfe    /* NXSwapInt(MH_MAGIC_64) */
-#define FAT_MAGIC		0xcafebabe    /* the fat magic number */
-#define FAT_CIGAM		0xbebafeca    /* NXSwapLong(FAT_MAGIC) */
-#define FAT_MAGIC_64	0xcafebabf    /* the 64-bit fat magic number */
-#define FAT_CIGAM_64	0xbfbafeca    /* NXSwapLong(FAT_MAGIC_64) */
+# define MH_MAGIC		0xfeedface
+# define MH_CIGAM		0xcefaedfe
+# define MH_MAGIC_64	0xfeedfacf
+# define MH_CIGAM_64	0xcffaedfe
+# define FAT_MAGIC		0xcafebabe
+# define FAT_CIGAM		0xbebafeca
+# define FAT_MAGIC_64	0xcafebabf
+# define FAT_CIGAM_64	0xbfbafeca
 
 # define ARCHIVE_CIGAM		0x72613C21
 # define ARCHIVE_MAGIC		0x213C6172
 # define FIRST_BIT_ON_64	0x8000000000000000L
 
-#define N_STAB	0xe0            /* if any of these bits set, a symbolic debugging entry */
-#define N_PEXT	0x10            /* private external symbol bit */
-#define N_TYPE	0x0e            /* mask for the type bits */
-#define N_EXT	0x01            /* external symbol bit, set for external symbols */
+# define N_STAB	0xe0
+# define N_PEXT	0x10
+# define N_TYPE	0x0e
+# define N_EXT	0x01
 
-#define N_UNDF	0x0             /* undefined, n_sect == NO_SECT */
-#define N_ABS	0x2             /* absolute, n_sect == NO_SECT */
-#define N_SECT	0xe             /* defined in section number n_sect */
-#define N_PBUD	0xc             /* prebound undefined (defined in a dylib) */
-#define N_INDR	0xa             /* indirect */
+# define N_UNDF	0x0
+# define N_ABS	0x2
+# define N_SECT	0xe
+# define N_PBUD	0xc
+# define N_INDR	0xa
 
 # define OTOOL_SECTION		"__text"
 # define OTOOL_SEGMENT		"__TEXT"

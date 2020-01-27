@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   section_character_table.c                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlobunet <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/01/27 19:49:28 by vlobunet          #+#    #+#             */
+/*   Updated: 2020/01/27 19:49:29 by vlobunet         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/nm_otool.h"
 
-char		char_table(const size_t offset)
+char	char_table(const size_t offset)
 {
 	static char		ch[256];
 	static uint8_t	s;
@@ -26,19 +38,19 @@ char		char_table(const size_t offset)
 	return ('1');
 }
 
-int check_type(char c)
+int		check_type(char c)
 {
 	if (!g_f.attributes->g || (c >= 'A' && c <= 'Z'))
 	{
-		if (!g_f.attributes->U && !g_f.attributes->T &&
-			!g_f.attributes->B && !g_f.attributes->S &&
-			!g_f.attributes->D)
+		if (!g_f.attributes->au && !g_f.attributes->at &&
+			!g_f.attributes->ab && !g_f.attributes->as &&
+			!g_f.attributes->ad)
 			return (1);
-		if ((ft_tolower(c) == 'u' && !g_f.attributes->U) ||
-			(ft_tolower(c) == 't' && !g_f.attributes->T) ||
-			(ft_tolower(c) == 'b' && !g_f.attributes->B) ||
-			(ft_tolower(c) == 's' && !g_f.attributes->S) ||
-			(ft_tolower(c) == 'd' && !g_f.attributes->D))
+		if ((ft_tolower(c) == 'u' && !g_f.attributes->au) ||
+			(ft_tolower(c) == 't' && !g_f.attributes->at) ||
+			(ft_tolower(c) == 'b' && !g_f.attributes->ab) ||
+			(ft_tolower(c) == 's' && !g_f.attributes->as) ||
+			(ft_tolower(c) == 'd' && !g_f.attributes->ad))
 			return (0);
 		else
 			return (1);
@@ -46,7 +58,7 @@ int check_type(char c)
 	return (0);
 }
 
-int segment_manager(size_t start_offset)
+int		segment_manager(size_t start_offset)
 {
 	struct segment_command_64	*seg;
 	struct section_64			*sect;
