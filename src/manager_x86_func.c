@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   manager_x86_func.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vlobunet <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: vlobunet <vlobunet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/27 19:44:34 by vlobunet          #+#    #+#             */
-/*   Updated: 2020/01/27 19:44:35 by vlobunet         ###   ########.fr       */
+/*   Updated: 2020/01/29 11:10:19 by vlobunet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,11 +96,11 @@ int			main_parser_86(t_cmanager ptr_func, uint32_t type)
 	t_manager	m;
 
 	m.ofset = sizeof(struct mach_header);
-	if (!(m.hdr = get_struct(0, sizeof(*(m.hdr)))))
-		return (err(ERR_SYS, __func__));
+	if (!(m.hdr = get_struct(0, sizeof(*m.hdr))))
+		return (err(ERR_SYS, "bad macho header offset"));
+	if (!(m.lc = get_struct(m.ofset, sizeof(*m.lc))))
+		return (err(ERR_SYS, "bad load command offset"));
 	m.ncmds = get_4b(m.hdr->ncmds);
-	if (!(m.lc = get_struct(m.ofset, sizeof(*(m.lc)))))
-		return (err(ERR_SYS, __func__));
 	while (m.ncmds--)
 	{
 		m.cmd_type = get_4b(m.lc->cmd);
@@ -108,7 +108,7 @@ int			main_parser_86(t_cmanager ptr_func, uint32_t type)
 			ptr_func(m.ofset);
 		m.ofset = m.ofset + get_4b(m.lc->cmdsize);
 		if (!(m.lc = get_struct(m.ofset, sizeof(*m.lc))))
-			return (err(ERR_SYS, __func__));
+			return (err(ERR_SYS, "bad load command offset"));
 	}
 	return (0);
 }

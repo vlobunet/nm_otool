@@ -13,7 +13,7 @@ int		fat_manager_86(uint32_t nfat_arch, size_t offset, size_t *target_offset, ui
 			return (err(ERR_FILE, "bad fat arch magic offset"));
 		if (*magic_ptr == MH_CIGAM_64 || *magic_ptr == MH_MAGIC_64)
 			*target_offset = get_4b(arch->offset);
-		else if (!(*target_offset) && (*magic_ptr == MH_CIGAM || \
+		else if (!(*target_offset) && (*magic_ptr == MH_CIGAM ||
 			*magic_ptr == MH_MAGIC))
 			*target_offset = get_4b(arch->offset);
 		offset += sizeof(*arch);
@@ -28,16 +28,12 @@ int		fat_manager_64(uint32_t nfat_arch, size_t offset, size_t *target_offset, ui
 	struct fat_arch			*arch;
 	uint32_t				*magic_ptr;
 
-	// loop through architectures looking for known magic
 	while (nfat_arch--)
 	{
-		//retrieve safe pointers
 		if (!(arch = get_struct(offset, sizeof(*arch))))
 			return (err(ERR_FILE, "bad fat arch offset"));
 		if (!(magic_ptr = get_struct(get_4b(arch->offset), sizeof(*magic_ptr))))
 			return (err(ERR_FILE, "bad fat arch magic offset"));
-
-		// check for known magic
 		if (*magic_ptr == MH_CIGAM_64 || *magic_ptr == MH_MAGIC_64)
 			*target_offset = get_4b(arch->offset);
 		else if (!(*target_offset) && (*magic_ptr == MH_CIGAM || \

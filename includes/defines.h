@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   defines.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vlobunet <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: vlobunet <vlobunet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/27 19:23:54 by vlobunet          #+#    #+#             */
-/*   Updated: 2020/01/27 19:23:57 by vlobunet         ###   ########.fr       */
+/*   Updated: 2020/01/29 11:10:30 by vlobunet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 # define DEFINES_H
 
 # include "nm_otool.h"
+
+//#include <stdio.h>
 
 # define BLACK      "\033[1;30m"
 # define RED        "\033[1;31m"

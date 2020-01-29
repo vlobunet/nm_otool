@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main_check.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vlobunet <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: vlobunet <vlobunet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/27 19:42:13 by vlobunet          #+#    #+#             */
-/*   Updated: 2020/01/27 19:42:14 by vlobunet         ###   ########.fr       */
+/*   Updated: 2020/01/29 11:15:04 by vlobunet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,6 @@ int		munmap_file(t_save_file f)
 		return (err(ERR_SYS, "Unable to free file displayed in memory"));
 	return (0);
 }
-#include <stdio.h>
 
 int		check_architecture(void)
 {
