@@ -8,9 +8,9 @@ CFLAGS = -Wall -Wextra -Werror # -fsanitize=address,undefined
 
 COMMON_SRC = get_bytes.c print_error_attrlett.c \
 			check_attributes.c main_check.c manager_x86_func.c \
-			manager_x64_func.c section_character_table.c fat_manager.c
+			manager_x64_func.c section_character_table.c
 
-NM_SRC = ft_nm.c sorted_func.c ${COMMON_SRC}
+NM_SRC = ft_nm.c sorted_func.c fat_manager.c arch_manager.c ${COMMON_SRC}
 
 OTOOL_SRC = ft_otool.c otool_manager_x64.c otool_manager_x86.c ${COMMON_SRC}
 

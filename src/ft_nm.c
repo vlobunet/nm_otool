@@ -6,7 +6,7 @@
 /*   By: vlobunet <vlobunet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/27 19:38:38 by vlobunet          #+#    #+#             */
-/*   Updated: 2020/01/29 11:15:56 by vlobunet         ###   ########.fr       */
+/*   Updated: 2020/01/29 11:39:11 by vlobunet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,7 @@ int		main_run(void)
 	g_f.type == 2 ? main_parser_64(func_cmanager[2], LC_SYMTAB) : 0;
 	g_f.type == 3 ? manager_fat(func_fmanager[0]): 0;
 	g_f.type == 4 ? manager_fat(func_fmanager[1]): 0;
+	g_f.type == 5 ? manager_arch(): 0;
 	return (0);
 }
 
@@ -98,6 +99,5 @@ int		main(int argc, char **argv)
 	lst_sort();
 	if (munmap_file(g_f))
 		return (1);
-	//system("leaks ft_nm");
 	return (0);
 }

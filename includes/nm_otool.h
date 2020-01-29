@@ -6,7 +6,7 @@
 /*   By: vlobunet <vlobunet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/27 19:27:00 by vlobunet          #+#    #+#             */
-/*   Updated: 2020/01/28 00:26:59 by vlobunet         ###   ########.fr       */
+/*   Updated: 2020/01/29 11:39:17 by vlobunet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,5 +78,6 @@ void		print_text_section(uint64_t size, uint64_t offset, char *text);
 
 int		fat_manager_64(uint32_t nfat_arch, size_t offset, size_t *target_offset, uint32_t *magic);
 int		fat_manager_86(uint32_t nfat_arch, size_t offset, size_t *target_offset, uint32_t *magic);
+int manager_arch(void);
 
 #endif
