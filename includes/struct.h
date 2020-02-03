@@ -6,7 +6,7 @@
 /*   By: vlobunet <vlobunet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/27 19:28:40 by vlobunet          #+#    #+#             */
-/*   Updated: 2020/01/28 00:25:27 by vlobunet         ###   ########.fr       */
+/*   Updated: 2020/02/03 10:25:33 by vlobunet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ typedef struct				s_attr
 	uint8_t					t;
 	uint8_t					a;
 	uint8_t					p;
-
 	char					**f;
 }							t_attr;
 
