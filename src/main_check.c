@@ -95,6 +95,4 @@ int		check_architecture(void)
 	if (!type)
 		err(ERR_FILE, "unknown format");
 	return (type);
-
-		
 }

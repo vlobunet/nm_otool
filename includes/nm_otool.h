@@ -76,8 +76,10 @@ int			otool_print_sector_64(size_t start_offset);
 
 void		print_text_section(uint64_t size, uint64_t offset, char *text);
 
-int		fat_manager_64(uint32_t nfat_arch, size_t offset, size_t *target_offset, uint32_t *magic);
-int		fat_manager_86(uint32_t nfat_arch, size_t offset, size_t *target_offset, uint32_t *magic);
-int manager_arch(void);
+int			fat_manager_64(uint32_t nfat_arch, size_t offset,
+	size_t *target_offset, uint32_t *magic);
+int			fat_manager_86(uint32_t nfat_arch, size_t offset,
+	size_t *target_offset, uint32_t *magic);
+int			manager_arch(void);
 
 #endif

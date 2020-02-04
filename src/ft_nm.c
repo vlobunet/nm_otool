@@ -12,6 +12,22 @@
 
 #include "../includes/nm_otool.h"
 
+void	print_str(char *ret)
+{
+	int i;
+	int len;
+
+	i = 0;
+	len = ft_strlen(ret);
+	while (i != 15 - len)
+	{
+		ft_putchar_fd('0', STDOUT);
+		i++;
+	}
+	ft_putstr_fd(ret, STDOUT);
+	ft_putchar_fd(32, STDOUT);
+}
+
 void	print_lst(t_sym *sort)
 {
 	char	*ret;
@@ -29,8 +45,7 @@ void	print_lst(t_sym *sort)
 		else
 		{
 			ret = ft_itoabase(sort->off, 16);
-			ft_putstr_fd("0000000", STDOUT);
-			ft_putstr_fd(ret, STDOUT);
+			print_str(ret);
 			ft_strdel(&ret);
 		}
 		ft_putchar_fd(' ', STDOUT);
@@ -41,7 +56,7 @@ void	print_lst(t_sym *sort)
 	}
 }
 
-int manager_fat(t_fmanager func_ptr)
+int		manager_fat(t_fmanager func_ptr)
 {
 	static t_cmanager	func_cmanager[3];
 	struct fat_header	*hdr;
@@ -52,7 +67,6 @@ int manager_fat(t_fmanager func_ptr)
 	func_cmanager[0] = &segment_manager;
 	func_cmanager[1] = &symtab_manager_86;
 	func_cmanager[2] = &symtab_manager_64;
-
 	if (!(hdr = get_struct(0, sizeof(*hdr))))
 		return (err(ERR_FILE, "missing fat header"));
 	if (!func_ptr(get_4b(hdr->nfat_arch), sizeof(*hdr), &off, &magic))
@@ -83,9 +97,9 @@ int		main_run(void)
 	g_f.type == 1 ? main_parser_86(func_cmanager[1], LC_SYMTAB) : 0;
 	g_f.type == 2 ? main_parser_64(func_cmanager[0], LC_SEGMENT_64) : 0;
 	g_f.type == 2 ? main_parser_64(func_cmanager[2], LC_SYMTAB) : 0;
-	g_f.type == 3 ? manager_fat(func_fmanager[0]): 0;
-	g_f.type == 4 ? manager_fat(func_fmanager[1]): 0;
-	g_f.type == 5 ? manager_arch(): 0;
+	g_f.type == 3 ? manager_fat(func_fmanager[0]) : 0;
+	g_f.type == 4 ? manager_fat(func_fmanager[1]) : 0;
+	g_f.type == 5 ? manager_arch() : 0;
 	return (0);
 }
 

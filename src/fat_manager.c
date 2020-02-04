@@ -1,6 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   fat_manager.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlobunet <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/02/04 19:40:09 by vlobunet          #+#    #+#             */
+/*   Updated: 2020/02/04 19:40:11 by vlobunet         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/nm_otool.h"
 
-int		fat_manager_86(uint32_t nfat_arch, size_t offset, size_t *target_offset, uint32_t *magic)
+int		fat_manager_86(uint32_t nfat_arch, size_t offset,
+	size_t *target_offset, uint32_t *magic)
 {
 	struct fat_arch			*arch;
 	uint32_t				*magic_ptr;
@@ -23,7 +36,8 @@ int		fat_manager_86(uint32_t nfat_arch, size_t offset, size_t *target_offset, ui
 	return (1);
 }
 
-int		fat_manager_64(uint32_t nfat_arch, size_t offset, size_t *target_offset, uint32_t *magic)
+int		fat_manager_64(uint32_t nfat_arch, size_t offset,
+	size_t *target_offset, uint32_t *magic)
 {
 	struct fat_arch			*arch;
 	uint32_t				*magic_ptr;

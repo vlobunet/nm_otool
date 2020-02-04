@@ -15,8 +15,6 @@
 
 # include "nm_otool.h"
 
-//#include <stdio.h>
-
 # define BLACK      "\033[1;30m"
 # define RED        "\033[1;31m"
 # define GREEN      "\033[01;38;05;46m"
